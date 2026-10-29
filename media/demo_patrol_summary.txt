@@ -1,0 +1,8 @@
+# Patrol summary printed by tools/record_demo.sh for the recorded take (media/demo.mp4).
+# (The full record_patrol.log of this take was not kept; media/trajectory.csv is its path log.)
+OK   north_west         14.1 s  0 recoveries
+OK   east               12.6 s  0 recoveries
+OK   south              15.7 s  0 recoveries
+OK   centre              7.8 s  0 recoveries
+OK   home               17.1 s  0 recoveries
+5/5 goals reached, 67.2 s driving, 0 recoveries

@@ -1,9 +1,16 @@
 # TurtleBot3 + Nav2 autonomous navigation in Gazebo
 
 A TurtleBot3 Waffle in **Gazebo Harmonic** uses the **ROS 2 Jazzy Navigation2 stack** to drive a
-5-goal patrol through the TurtleBot3 world. Obstacles that are **not in the static map** block every
-leg, and a "surprise" box is dropped onto the robot's route mid-run. Nav2 has to see each obstacle
-with the LiDAR, mark it in the costmaps, and replan around it.
+5-goal patrol through the TurtleBot3 world. Three obstacles that are **not in the static map** sit
+on the routes the planner would otherwise take, and a "surprise" box is dropped onto the robot's
+route mid-run. Nav2 only learns about them through the LiDAR, marks them in its costmaps, and plans
+around them.
+
+> **Project page:** open [`docs/index.html`](docs/index.html) in a browser (works offline from
+> the cloned repo). It has an animated replay of the logged path with re-simulated LiDAR, an
+> interactive architecture diagram, the video with chapters, and the experiment charts.
+> `docs/index.html#replay=stock@24.5` jumps straight to the stock-params robot being stopped by
+> `collision_monitor` in front of the surprise box.
 
 > **Demo video (79 s):** [`media/demo.mp4`](media/demo.mp4): Gazebo on the left, RViz on the
 > right, live caption at the bottom. Recorded with `./tools/record_demo.sh`.
@@ -15,8 +22,8 @@ costmap (right), the green global plan swings west through the pillars, and the 
 
 ![Driven path vs. obstacles](media/trajectory.png)
 
-*Path driven in the recorded demo: 5/5 goals, 67.2 s, 0 recoveries, never closer than 0.09 m to
-an obstacle beyond its own footprint. Magenta shapes are **not** in the map Nav2 was given. Stars
+*Path driven in the recorded demo: 5/5 goals, 67.2 s, 0 recoveries. It never came closer than
+0.09 m to any unmapped obstacle beyond its footprint. Magenta shapes are **not** in the map Nav2 was given. Stars
 are goals.*
 
 ---
@@ -25,11 +32,12 @@ are goals.*
 
 | Path | Purpose |
 |---|---|
-| `Dockerfile`, `docker/` | Reproducible ROS 2 Jazzy + Gazebo Harmonic + Nav2 image, GUI run script |
+| `Dockerfile`, `docker/` | Reproducible ROS 2 Jazzy + Gazebo Harmonic + Nav2 image, GUI run script, shared GPU detection (`gpu_args.sh`) |
 | `tb3_nav2_demo/launch/demo.launch.py` | Wraps the stock `nav2_bringup/tb3_simulation_launch.py` with this package's world, params and RViz config. Optionally starts the patrol |
 | `tb3_nav2_demo/worlds/tb3_obstacles.sdf.xacro` | TurtleBot3 sandbox world plus 3 extra obstacles that are not in the map |
 | `tb3_nav2_demo/config/nav2_params.yaml` | Nav2 params (stock + documented `[tuned]` changes) |
 | `tb3_nav2_demo/config/nav2_params_stock.yaml` | Untouched upstream params, for A/B comparison |
+| `tb3_nav2_demo/config/nav2_params_tuned_v1.yaml`, `nav2_params_exp_speed_only.yaml` | Intermediate configs used in the experiments, kept so every comparable run can be reproduced |
 | `tb3_nav2_demo/config/waypoints.yaml` | Patrol route and the surprise-obstacle spec |
 | `tb3_nav2_demo/scripts/patrol.py` | Sends goals with `nav2_simple_commander`, logs results, path and recoveries, spawns the surprise obstacle |
 | `tb3_nav2_demo/scripts/plot_trajectory.py` | Plots the driven path over the map, computes clearance to every obstacle and the reaction (stall) time at the surprise box |
@@ -37,7 +45,8 @@ are goals.*
 | `tools/headless_test.sh` | End-to-end test without GUI. Exits non-zero if a goal fails or the robot touches an obstacle |
 | `tools/record_demo.sh` | Records the demo video on a virtual display inside the container |
 | `results/` | Logs, CSVs and plots from the experiment runs below |
-| `media/` | Demo video, GIF, and path/plot of the recorded run |
+| `media/` | Demo video, GIF, path log/plot and patrol summary of the recorded run |
+| `docs/index.html`, `tools/build_page_data.py` | Project page; its data is regenerated from `results/` and `media/` |
 
 No custom navigation algorithms. Planning, control, localisation and recovery are all stock Nav2
 (NavFn planner, MPPI controller, AMCL, behaviour-tree navigator). The work here is integration,
@@ -66,16 +75,17 @@ Gazebo Harmonic ──(ros_gz_bridge: /scan /odom /tf /clock, cmd_vel)──► 
 ## Quick start (Docker, any Linux with X11/XWayland)
 
 ```bash
-git clone <this repo> && cd turtlebot3-nav2-gazebo
-docker build -t tb3-nav2 .
+git clone https://github.com/aPassie/turtlebot3-nav2-gazebo.git && cd turtlebot3-nav2-gazebo
+docker build -t tb3-nav2 .        # ~5 GB image, 5-10 min the first time
 
 # Full demo: Gazebo GUI + RViz, robot runs the patrol on its own
 ./docker/run.sh
 ```
 
-`docker/run.sh` forwards X11 and passes through Intel/AMD GPUs for hardware OpenGL (see
-[Problems](#problems-i-hit-and-how-i-fixed-them) for NVIDIA notes). For software rendering add
-`LIBGL_ALWAYS_SOFTWARE=1`.
+`docker/run.sh` forwards X11 (XWayland works) and passes through Intel/AMD GPUs for hardware
+OpenGL. If the NVIDIA Container Toolkit is installed it uses `--gpus all` instead (untested: my
+machine didn't have the toolkit). `NO_GPU=1 ./docker/run.sh` forces software rendering. The
+package is copied into the image, so **re-run `docker build` after editing params or scripts**.
 
 Other ways to run it:
 
@@ -98,14 +108,18 @@ Other ways to run it:
 
 ### Native install (Ubuntu 24.04 + ROS 2 Jazzy)
 
+Not tested by me (I used Docker). These steps mirror the Dockerfile.
+
 ```bash
-sudo apt install ros-jazzy-navigation2 ros-jazzy-nav2-bringup ros-jazzy-nav2-minimal-tb3-sim \
-                 ros-jazzy-nav2-simple-commander ros-jazzy-ros-gz
+source /opt/ros/jazzy/setup.bash
+mkdir -p ~/tb3_ws/src && cp -r tb3_nav2_demo ~/tb3_ws/src/ && cd ~/tb3_ws
+sudo apt install python3-rosdep python3-colcon-common-extensions
+sudo rosdep init 2>/dev/null; rosdep update
+rosdep install --from-paths src --ignore-src -y     # Nav2, nav2_minimal_tb3_sim, ros_gz, ...
 # Work around the upstream mesh-path bug so RViz can draw the robot (see Problems #3)
-cd /opt/ros/jazzy/share/nav2_minimal_tb3_sim/models && \
-  for f in turtlebot3_model/meshes/*.dae; do sudo ln -sf "$f" .; done; cd -
-mkdir -p ~/tb3_ws/src && cp -r tb3_nav2_demo ~/tb3_ws/src/
-cd ~/tb3_ws && colcon build && source install/setup.bash
+(cd /opt/ros/jazzy/share/nav2_minimal_tb3_sim/models && \
+  for f in turtlebot3_model/meshes/*.dae; do sudo ln -sf "$f" .; done)
+colcon build && source install/setup.bash
 ros2 launch tb3_nav2_demo demo.launch.py
 ```
 
@@ -115,8 +129,10 @@ ros2 launch tb3_nav2_demo demo.launch.py
 world adds a crate, a barrel and a barrier that are not in that map. Nav2 only finds out about
 them through the LiDAR-fed `voxel_layer` (local costmap) and `obstacle_layer` (global costmap).
 
-**Placement is data-driven.** Each obstacle sits on the shortest path the planner took for one
-leg in an earlier run, so every leg has to replan (see Experiments, run 0 → 1).
+**Placement is data-driven.** Each static obstacle sits on the route the planner took for one leg
+in an earlier run when that spot was free, so the robot has to detour (see Experiments, run 0 → 1).
+They are usually already in the costmap when their leg starts (LiDAR range 3.5 m, obstacle marking
+to 2.5 m), so the *first* plan avoids them. The surprise box is the real test of replanning mid-leg.
 
 **Surprise obstacle.** On the `south` leg, `patrol.py` uses `ros_gz_sim create` to spawn a
 0.4 m box on the robot's current route once the robot is within 1.2 m of it. The gaps either
@@ -127,40 +143,35 @@ time. Each goal reports success/failure, duration and the number of recoveries.
 
 ## Experiments
 
-Every run is reproducible with `./tools/headless_test.sh <stock|tuned|file.yaml>`.
+**Runs 2–8 are reproducible** with `./tools/headless_test.sh <config>`, where the config is
+`stock`, `tuned`, or one of the YAML files in `tb3_nav2_demo/config/`. Runs 0–1 used an earlier
+obstacle layout and a timer trigger that only survive in their plots/log in `results/`. Metrics:
 
-- **Clearance**: minimum distance between the robot footprint (r = 0.22 m) and any unmapped
-  obstacle surface, computed from the logged path.
-- **Stall**: time the robot sat almost still (< 0.05 m/s) between the surprise box appearing
-  and the robot driving past it.
+- **Clearance**: minimum distance between the robot footprint and any *unmapped* obstacle
+  surface, from the logged path. Shown for Nav2's configured `robot_radius` (0.22 m) and a
+  conservative 0.24 m (the Waffle's rear corner is ~0.238 m from `base_link`).
+- **Stall**: time the robot sat almost still (< 0.05 m/s) between the surprise-box trigger and
+  driving past the box.
+- **CM**: how often `collision_monitor` had to step in ("Robot to approach …" in the log).
 
-Logs, CSVs and plots are in [`results/`](results).
+| Run | Change being tested | Config | Goals | Driving time | Recov. | Min clearance (0.22 / 0.24 m) | Stall | `south` leg | CM |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | First obstacle layout, timer-triggered box | stock | 5/5 | 78.3 s | 1 | +0.102 / – | n/a | – | – |
+| 1 | Obstacles moved onto the planner's paths | stock | 5/5 | 51.1 s | 0 | +0.215\* / – | n/a | – | – |
+| 2 | Box triggered by **proximity** | stock | 5/5 | 59.9 s | 0 | +0.114 / +0.094 | 2.1 s | 16.6 s | 1 |
+| 4 | repeat of 2 | stock | 5/5 | 58.0 s | 0 | +0.124 / +0.104 | 1.6 s | 15.8 s | 1 |
+| 3 | Real TB3 speed limits **+** 10 Hz local costmap | `tuned_v1` | 5/5 | 69.0 s | 0 | +0.096 / +0.076 | 0.5 s | 17.1 s | 0 |
+| 5 | repeat of 3 | `tuned_v1` | 5/5 | 67.0 s | 0 | +0.107 / +0.087 | 0.5 s | 16.6 s | 0 |
+| 6a | **+** 5 Hz global costmap | tuned (default) | 5/5 | 67.5 s | 0 | +0.120 / +0.100 | 0.0 s | 15.9 s | 0 |
+| 6b | repeat of 6a | tuned | 5/5 | 68.6 s | 0 | +0.155 / +0.135 | 0.5 s | 16.2 s | 0 |
+| demo | the recorded video run (GUI + RViz) | tuned | 5/5 | 67.2 s | 0 | +0.094 / +0.074 | 0.0 s | 15.7 s | – |
+| 7a | **Only** the speed limits (isolation test) | `exp_speed_only` | 5/5 | 68.1 s | 0 | +0.135 / +0.115 | 0.0 s | 16.0 s | 0 |
+| 7b | repeat of 7a | `exp_speed_only` | 5/5 | 66.6 s | 0 | +0.084 / +0.064 | 0.0 s | 15.3 s | 0 |
+| 8 | Default config, **no GPU** (software rendering) | tuned | 5/5 | 67.4 s | 0 | +0.121 / +0.101 | 0.0 s | 15.7 s | 0 |
 
-| Run | Change being tested | Params | Goals | Driving time | Recoveries | Min clearance | Stall at surprise box |
-|---|---|---|---|---|---|---|---|
-| 0 | First obstacle layout, timer-triggered surprise box | stock | 5/5 | 78.3 s | 1 (controller stuck at the barrel) | +0.102 m | n/a |
-| 1 | Obstacles moved onto the planner's actual paths | stock | 5/5 | 51.1 s | 0 | +0.215 m* | n/a* |
-| 2 | Surprise box triggered by **proximity** instead of a timer | stock | 5/5 | 59.9 s | 0 | +0.114 m | 2.1 s |
-| 4 | repeat of 2 | stock | 5/5 | 58.0 s | 0 | +0.124 m | 1.6 s |
-| 3 | **Real TB3 Waffle speed limits** + local costmap 5 → 10 Hz | tuned v1 | 5/5 | 69.0 s | 0 | +0.096 m | 0.5 s |
-| 5 | repeat of 3 | tuned v1 | 5/5 | 67.0 s | 0 | +0.107 m | 0.5 s |
-| 6a | + **global costmap 1 → 5 Hz** | tuned (final) | 5/5 | 67.5 s | 0 | +0.120 m | 0.0 s |
-| 6b | repeat of 6a | tuned (final) | 5/5 | 68.6 s | 0 | +0.155 m | 0.5 s |
-| demo | the recorded video run (GUI + RViz) | tuned (final) | 5/5 | 67.2 s | 0 | +0.094 m | 0.0 s |
-
-\* In run 1 the timer-spawned box landed where the robot never went. The large clearance means
-the test was broken, not that navigation improved.
-
-The final config differs from upstream `nav2_params.yaml` only in what's marked `[tuned]`
-(`diff tb3_nav2_demo/config/nav2_params_stock.yaml tb3_nav2_demo/config/nav2_params.yaml`):
-
-| Parameter | Stock | Tuned | Why |
-|---|---|---|---|
-| MPPI `vx_max` / `vx_min` / `wz_max` | 0.5 / −0.35 / 1.9 | 0.26 / −0.26 / 1.82 | Real TurtleBot3 Waffle limits |
-| `velocity_smoother` max/min velocity | ±0.5, ±2.0 | ±0.26, ±1.82 | Same limits after smoothing |
-| Local costmap `update_frequency` | 5 Hz | 10 Hz | Sudden obstacles reach the controller sooner |
-| Global costmap `update_frequency` | 1 Hz | 5 Hz | Planner sees new obstacles sooner and reroutes earlier |
-| AMCL `set_initial_pose` | off | on, at the spawn pose | No manual "2D Pose Estimate" needed |
+\* In run 1 the timer-spawned box landed where the robot never went, so this large clearance
+means the test was broken, not that navigation improved. The demo's patrol log wasn't kept (its
+summary is in `media/demo_patrol_summary.txt`), so its CM count is unknown.
 
 **What I learned from each step**
 
@@ -168,29 +179,71 @@ The final config differs from upstream `nav2_params.yaml` only in what's marked 
   between the walls and pillars. The plot showed NavFn takes the shortest route *between* the
   pillars, so 3 of 4 obstacles were never closer than 0.4 m to the path. The barrel was the
   exception: MPPI got stuck next to it ("Failed to make progress"), a recovery ran, and the leg
-  took 33 s. I moved every obstacle onto the paths from that run.
+  took 33 s. I moved every obstacle onto the routes from that run.
 - **Run 1, a timer is the wrong trigger.** Without the old east barrier, the robot took a
   different route on the `south` leg, so the box spawned 6 s into the leg landed on a route it
   never used. I replaced the timer with a proximity trigger. From run 2 on, the box appears about
-  1 m ahead of the robot, the leg takes ~16 s instead of 9 s, and the plot shows the reroute.
-- **Runs 2–5, real speed limits.** Stock Nav2 drives the TB3 at 0.5 m/s, but a real Waffle tops
-  out at 0.26 m/s. I expected the slower robot to keep more distance from the surprise box.
-  **It didn't.** Clearance was the same within noise. The speed profile showed why: in both
-  profiles the robot *stops* ~0.55 m short of the box, and the closest approach happens later,
-  while it drives the new path past the box's corner. That distance is set by the costmap
-  inflation and the route, not by speed. Two things did change. The stock robot stalled
-  1.6–2.1 s before moving off, the tuned one only 0.5 s (it was already slower and eased off
-  instead of braking hard). The full patrol took ~15% longer (≈59 s → ≈68 s), not 2×, because the
-  robot rarely reaches 0.5 m/s in this tight arena. I kept the real limits: a config that matches
-  the hardware is the one you'd deploy.
-- **Run 6, why the stall?** The global costmap updates at 1 Hz and the behaviour tree replans at
-  1 Hz, so up to ~2 s can pass before the planner knows the box exists. Raising the global
-  costmap to 5 Hz (negligible CPU on this map) made the robot reroute ~1 s sooner: `south` leg
-  15.7–16.2 s vs. 16.6–17.1 s, stall 0–0.5 s. Clearance stayed within the same noise band
-  (+0.09 to +0.16 m), so the gain is responsiveness, not safety margin. It's small and only
-  n = 3, but it was consistent across all runs.
-- Inflation (0.7 m radius, scaling 3.0) stayed at stock values. With it there were no recoveries
-  and no contact in any run after run 0, so I had no evidence to justify changing it.
+  1 m ahead of the robot.
+- **Runs 2 & 4, what the stall actually is.** With stock params the robot stops ~0.55 m short of
+  the box for 1.6–2.1 s. In both runs the log shows, 0.9 s after the spawn,
+  `collision_monitor: Robot to approach for 1.2 seconds away from collision` followed by
+  `controller_server: Optimizer fail to compute path`. The `FootprintApproach` polygon slows the
+  robot so it can't collide within 1.2 s. At the stock 0.5 m/s that's a ~0.6 m look-ahead, which
+  matches the stopping distance. The last-line safety layer, not the planner, is what stops the
+  robot.
+- **Runs 3–6, a confounded experiment.** I changed the speed limits to the real Waffle's
+  0.26 m/s, *and* raised the local costmap to 10 Hz, *and* later raised the global costmap to
+  5 Hz. The stall disappeared, and I first credited the 5 Hz global costmap with rerouting ~1 s
+  sooner. An independent review of the repo pointed out the confound, and that the simulated
+  LiDAR only publishes at 5 Hz, so a 10 Hz local costmap can't see anything new.
+- **Run 7, isolating the cause.** Changing *only* the speed limits gives stall 0.0 / 0.0 s and
+  zero `collision_monitor` interventions. At 0.26 m/s the 1.2 s horizon is only ~0.31 m, so MPPI
+  steers away from the box before the safety layer has to act. **The speed limit explains the
+  whole improvement.** Neither costmap-rate change has an effect I can distinguish from
+  run-to-run noise (`south` leg 15.3–17.1 s across all non-stock runs). My earlier "~1 s sooner"
+  claim doesn't survive this comparison.
+- **Clearance never depended on speed.** It stayed in the same +0.08 to +0.16 m band for every
+  config. The closest approach happens while the robot drives the new route past the box's
+  corner, so it is set by the inflation layer (0.7 m, scaling 3.0, left at stock) and the route.
+- **Run 8, no GPU.** The default config with no GPU device in the container (Mesa software
+  rendering) also passes, so the setup doesn't need hardware acceleration.
+
+**The final config** differs from upstream in what's marked `[tuned]`
+(`diff tb3_nav2_demo/config/nav2_params_stock.yaml tb3_nav2_demo/config/nav2_params.yaml`):
+
+| Parameter | Stock | Tuned | Evidence |
+|---|---|---|---|
+| MPPI `vx_max` / `vx_min` / `wz_max` | 0.5 / −0.35 / 1.9 | 0.26 / −0.26 / 1.82 | Real Waffle limits. Removes the collision-monitor stops (runs 2/4 vs 7) |
+| `velocity_smoother` max/min velocity | ±0.5, ±2.0 | ±0.26, ±1.82 | Same limits after smoothing |
+| Local costmap `update_frequency` | 5 Hz | 10 Hz | **No measurable effect.** LiDAR is 5 Hz |
+| Global costmap `update_frequency` | 1 Hz | 5 Hz | **No measurable effect** beyond noise (run 7 vs 6) |
+| AMCL `set_initial_pose` | off | on, at the spawn pose | No manual "2D Pose Estimate" needed |
+
+The two costmap-rate changes are harmless but not justified by the data. They stay in the default
+only because the recorded demo and runs 6/8 used them. What I'd ship is
+`nav2_params_exp_speed_only.yaml` plus the initial pose.
+
+### How much to trust these numbers
+
+- n = 2–4 runs per config. Differences of about a second in leg time are within noise.
+- Poses come from Nav2 feedback, i.e. the AMCL estimate, not Gazebo ground truth. AMCL
+  corrections make the logged pose jump by up to ~5 cm: over 0.5 s windows it implies up to
+  0.35 m/s against a 0.26 m/s cap. The tightest clearances (+0.06 to +0.10 m) are only 1–2× that
+  uncertainty, so "no contact" rests on this plus zero recoveries or stuck events in every run
+  after run 0, not on the clearance number alone.
+- Times are wall-clock. The simulation ran at ~0.97–1.0× real time.
+- The stall is measured from the trigger, which includes ~1 s of spawn latency (`ros2 run ros_gz_sim create`).
+
+### Known limitations / what I'd do next
+
+- Log Gazebo ground-truth pose (bridge `/model/.../pose`) and use `navigation_time` (sim time) for durations.
+- `vx_min = -0.26` lets the robot reverse as fast as it drives forward, and the acceleration limits
+  (smoother 2.5 m/s², MPPI 3.0) aren't matched to the hardware. I'd tighten both, and use the
+  real footprint polygon instead of `robot_radius`.
+- The video sends goals with `nav2_simple_commander`. Clicking "Nav2 Goal" in RViz works
+  (`patrol:=False`), but it isn't in the recording.
+- The initial pose is set by both AMCL params and `patrol.py`, which sometimes produces harmless
+  "Failed to transform initial pose" warnings at start-up.
 
 ## Problems I hit and how I fixed them
 
@@ -198,9 +251,10 @@ The final config differs from upstream `nav2_params.yaml` only in what's marked 
    With all of `/dev/dri` passed in, EGL picked the NVIDIA render node first. Mesa has no driver
    for it, so Ogre2 failed ("Failed to create dummy render window") and `gz sim` crashed. That
    left no LiDAR and no AMCL pose, and the patrol waited forever. I traced it with `eglinfo` and
-   `/sys/class/drm/*/device/driver`. The run scripts now pass only Mesa-capable DRM nodes, and
-   the container gets hardware rendering on the iGPU (AMD Radeon 780M, radeonsi). If the NVIDIA
-   runtime is installed, `run.sh` uses `--gpus all` instead.
+   `/sys/class/drm/*/device/driver`. The run scripts (`docker/gpu_args.sh`) now pass only
+   Mesa-capable DRM nodes, and the container gets hardware rendering on the iGPU (AMD Radeon 780M,
+   radeonsi). With `NO_GPU=1` it falls back to software rendering (verified, run 8). If the NVIDIA
+   runtime is installed it uses `--gpus all` instead (untested: no toolkit on my machine).
 2. **Test harness hung after a successful run.** Two bash bugs: a regex that didn't match the
    log format (`]:   5/5` vs. `] 5/5`), and `kill -INT` on a background job. Non-interactive
    bash starts background jobs with SIGINT ignored, so the launch never exited. Fixed with a
@@ -220,9 +274,17 @@ The final config differs from upstream `nav2_params.yaml` only in what's marked 
    the world with a fixed camera (setting it via `/gui/move_to/pose` didn't take effect), and an
    RViz layout without panels (the `Hide Dock` flags are overridden by the saved window state).
 
+6. **My own conclusions needed correcting, twice.** I first wrote that the closest approach to
+   the surprise box happens "the instant it appears". The speed profile showed it comes 5–6 s
+   later. Then I credited the 5 Hz global costmap with faster rerouting. The isolation run
+   (run 7) showed the speed limit alone explains it, and the log showed the stock-params stall is
+   a `collision_monitor` intervention. Both corrections are in the table above. The lesson I took:
+   change one variable at a time, and read the logs before explaining a number.
+
 ## Credits
 
 Built on [Nav2](https://docs.nav2.org/) (`nav2_bringup`, `nav2_minimal_tb3_sim`,
 `nav2_simple_commander`), [TurtleBot3](https://emanual.robotis.com/docs/en/platform/turtlebot3/)
 models by ROBOTIS, and [Gazebo](https://gazebosim.org/). The map, robot model and base world come
-from those packages unchanged.
+from those packages unchanged. The world file is derived from `nav2_minimal_tb3_sim`'s
+`tb3_sandbox.sdf.xacro` (Apache-2.0). This repo is Apache-2.0 too (see `LICENSE`).
