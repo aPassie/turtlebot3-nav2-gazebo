@@ -1,0 +1,842 @@
+[INFO] [launch]: All log files can be found below /root/.ros/log/2026-10-29-17-22-57-998904-70a9d92da7a2-22
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [xacro-1]: process started with pid [49]
+[INFO] [parameter_bridge-2]: process started with pid [50]
+[INFO] [create-3]: process started with pid [51]
+[INFO] [gz-4]: process started with pid [52]
+[INFO] [robot_state_publisher-5]: process started with pid [53]
+[INFO] [component_container_isolated-6]: process started with pid [54]
+[robot_state_publisher-5] [INFO] [1793294580.227130183] [robot_state_publisher]: Robot initialized
+[create-3] [INFO] [1793294580.249506909] [ros_gz_sim]: Requesting list of world names.
+[INFO] [xacro-1]: process has finished cleanly [pid 49]
+[component_container_isolated-6] [INFO] [1793294580.393666452] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libmap_server_core.so
+[component_container_isolated-6] [INFO] [1793294580.432340707] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_map_server::CostmapFilterInfoServer>
+[component_container_isolated-6] [INFO] [1793294580.432439063] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_map_server::MapSaver>
+[component_container_isolated-6] [INFO] [1793294580.432451807] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_map_server::MapServer>
+[component_container_isolated-6] [INFO] [1793294580.432460804] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_map_server::MapServer>
+[component_container_isolated-6] [INFO] [1793294580.450613695] [map_server]: 
+[component_container_isolated-6] 	map_server lifecycle node launched. 
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/map_server' in container '/nav2_container'
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.450682705] [map_server]: Creating
+[component_container_isolated-6] [INFO] [1793294580.451265586] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libamcl_core.so
+[component_container_isolated-6] [INFO] [1793294580.459058067] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_amcl::AmclNode>
+[component_container_isolated-6] [INFO] [1793294580.459119874] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_amcl::AmclNode>
+[component_container_isolated-6] [INFO] [1793294580.472900270] [amcl]: 
+[component_container_isolated-6] 	amcl lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.473705460] [amcl]: Creating
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/amcl' in container '/nav2_container'
+[component_container_isolated-6] [INFO] [1793294580.476115641] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libcontroller_server_core.so
+[component_container_isolated-6] [INFO] [1793294580.483528416] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_controller::ControllerServer>
+[component_container_isolated-6] [INFO] [1793294580.483601293] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_controller::ControllerServer>
+[component_container_isolated-6] [INFO] [1793294580.500645532] [controller_server]: 
+[component_container_isolated-6] 	controller_server lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.509882260] [controller_server]: Creating controller server
+[component_container_isolated-6] [INFO] [1793294580.522697655] [local_costmap.local_costmap]: 
+[component_container_isolated-6] 	local_costmap lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.523368110] [local_costmap.local_costmap]: Creating Costmap
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/controller_server' in container '/nav2_container'
+[component_container_isolated-6] [INFO] [1793294580.525172287] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libnav2_lifecycle_manager_core.so
+[component_container_isolated-6] [INFO] [1793294580.527537843] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_lifecycle_manager::LifecycleManager>
+[component_container_isolated-6] [INFO] [1793294580.527558331] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_lifecycle_manager::LifecycleManager>
+[component_container_isolated-6] [INFO] [1793294580.540773170] [lifecycle_manager_localization]: Creating
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/lifecycle_manager_localization' in container '/nav2_container'
+[component_container_isolated-6] [INFO] [1793294580.550984468] [lifecycle_manager_localization]: [34m[1mCreating and initializing lifecycle service clients[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.551153437] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libsmoother_server_core.so
+[component_container_isolated-6] [INFO] [1793294580.555960262] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_smoother::SmootherServer>
+[component_container_isolated-6] [INFO] [1793294580.555998695] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_smoother::SmootherServer>
+[component_container_isolated-6] [INFO] [1793294580.560842099] [lifecycle_manager_localization]: [34m[1mStarting managed nodes bringup...[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.560910358] [lifecycle_manager_localization]: [34m[1mConfiguring map_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.561194454] [map_server]: Configuring
+[component_container_isolated-6] [INFO] [1793294580.561285215] [map_io]: Loading yaml file: /opt/ros/jazzy/share/nav2_bringup/maps/tb3_sandbox.yaml
+[component_container_isolated-6] [INFO] [1793294580.561664532] [map_io]: resolution: 0.05
+[component_container_isolated-6] [INFO] [1793294580.561680922] [map_io]: origin[0]: -10
+[component_container_isolated-6] [INFO] [1793294580.561687605] [map_io]: origin[1]: -10
+[component_container_isolated-6] [INFO] [1793294580.561692875] [map_io]: origin[2]: 0
+[component_container_isolated-6] [INFO] [1793294580.561722902] [map_io]: free_thresh: 0.196
+[component_container_isolated-6] [INFO] [1793294580.561738110] [map_io]: occupied_thresh: 0.65
+[component_container_isolated-6] [INFO] [1793294580.561745144] [map_io]: mode: trinary
+[component_container_isolated-6] [INFO] [1793294580.561750594] [map_io]: negate: 0
+[component_container_isolated-6] [INFO] [1793294580.562041784] [map_io]: Loading image_file: /opt/ros/jazzy/share/nav2_bringup/maps/tb3_sandbox.pgm
+[component_container_isolated-6] [INFO] [1793294580.565789700] [map_io]: Read map /opt/ros/jazzy/share/nav2_bringup/maps/tb3_sandbox.pgm: 384 X 384 map @ 0.05 m/cell
+[component_container_isolated-6] [INFO] [1793294580.573237801] [lifecycle_manager_localization]: [34m[1mConfiguring amcl[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.573387865] [amcl]: Configuring
+[component_container_isolated-6] [INFO] [1793294580.573519794] [amcl]: initTransforms
+[component_container_isolated-6] [INFO] [1793294580.581853878] [smoother_server]: 
+[component_container_isolated-6] 	smoother_server lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.583793219] [amcl]: initPubSub
+[component_container_isolated-6] [INFO] [1793294580.583829147] [smoother_server]: Creating smoother server
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/smoother_server' in container '/nav2_container'
+[component_container_isolated-6] [INFO] [1793294580.592120931] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libplanner_server_core.so
+[component_container_isolated-6] [INFO] [1793294580.593667822] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_planner::PlannerServer>
+[component_container_isolated-6] [INFO] [1793294580.593697458] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_planner::PlannerServer>
+[component_container_isolated-6] [INFO] [1793294580.595707382] [amcl]: Subscribed to map topic.
+[component_container_isolated-6] [INFO] [1793294580.600878154] [lifecycle_manager_localization]: [34m[1mActivating map_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.601074776] [map_server]: Activating
+[component_container_isolated-6] [INFO] [1793294580.601461335] [map_server]: Creating bond (map_server) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294580.601711778] [amcl]: Received a 384 X 384 map @ 0.050 m/pix
+[component_container_isolated-6] [INFO] [1793294580.611581542] [planner_server]: 
+[component_container_isolated-6] 	planner_server lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.613715921] [planner_server]: Creating
+[component_container_isolated-6] [INFO] [1793294580.627018425] [global_costmap.global_costmap]: 
+[component_container_isolated-6] 	global_costmap lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.627832703] [global_costmap.global_costmap]: Creating Costmap
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/planner_server' in container '/nav2_container'
+[component_container_isolated-6] [INFO] [1793294580.631159163] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libroute_server_core.so
+[component_container_isolated-6] [INFO] [1793294580.634055351] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_route::RouteServer>
+[component_container_isolated-6] [INFO] [1793294580.634080578] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_route::RouteServer>
+[component_container_isolated-6] [INFO] [1793294580.651473114] [route_server]: 
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/route_server' in container '/nav2_container'
+[component_container_isolated-6] 	route_server lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.655632187] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libbehavior_server_core.so
+[component_container_isolated-6] [INFO] [1793294580.657817792] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<behavior_server::BehaviorServer>
+[component_container_isolated-6] [INFO] [1793294580.657870362] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<behavior_server::BehaviorServer>
+[component_container_isolated-6] [INFO] [1793294580.672680392] [behavior_server]: 
+[component_container_isolated-6] 	behavior_server lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/behavior_server' in container '/nav2_container'
+[component_container_isolated-6] [INFO] [1793294580.679916734] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libbt_navigator_core.so
+[component_container_isolated-6] [INFO] [1793294580.687685531] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_bt_navigator::BtNavigator>
+[component_container_isolated-6] [INFO] [1793294580.687763548] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_bt_navigator::BtNavigator>
+[component_container_isolated-6] [INFO] [1793294580.706460136] [lifecycle_manager_localization]: Server map_server connected with bond.
+[component_container_isolated-6] [INFO] [1793294580.706519338] [lifecycle_manager_localization]: [34m[1mActivating amcl[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.706772346] [amcl]: Activating
+[component_container_isolated-6] [INFO] [1793294580.706836717] [amcl]: Creating bond (amcl) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294580.713644991] [bt_navigator]: 
+[component_container_isolated-6] 	bt_navigator lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.715542213] [bt_navigator]: Creating
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/bt_navigator' in container '/nav2_container'
+[component_container_isolated-6] [INFO] [1793294580.717878694] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libwaypoint_follower_core.so
+[component_container_isolated-6] [INFO] [1793294580.719853502] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_waypoint_follower::WaypointFollower>
+[component_container_isolated-6] [INFO] [1793294580.719874512] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_waypoint_follower::WaypointFollower>
+[component_container_isolated-6] [INFO] [1793294580.739882916] [waypoint_follower]: 
+[component_container_isolated-6] 	waypoint_follower lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.741009212] [waypoint_follower]: Creating
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/waypoint_follower' in container '/nav2_container'
+[component_container_isolated-6] [INFO] [1793294580.744312299] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libvelocity_smoother_core.so
+[component_container_isolated-6] [INFO] [1793294580.746398728] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_velocity_smoother::VelocitySmoother>
+[component_container_isolated-6] [INFO] [1793294580.746426881] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_velocity_smoother::VelocitySmoother>
+[component_container_isolated-6] [INFO] [1793294580.766628510] [velocity_smoother]: 
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/velocity_smoother' in container '/nav2_container'
+[component_container_isolated-6] 	velocity_smoother lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.769508838] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libcollision_monitor_core.so
+[component_container_isolated-6] [INFO] [1793294580.773626091] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_collision_monitor::CollisionMonitor>
+[component_container_isolated-6] [INFO] [1793294580.773677518] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_collision_monitor::CollisionMonitor>
+[component_container_isolated-6] [INFO] [1793294580.795904271] [collision_monitor]: 
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/collision_monitor' in container '/nav2_container'
+[component_container_isolated-6] 	collision_monitor lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.799127636] [nav2_container]: Load Library: /opt/ros/jazzy/lib/libopennav_docking_core.so
+[component_container_isolated-6] [INFO] [1793294580.802177114] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<opennav_docking::DockingServer>
+[component_container_isolated-6] [INFO] [1793294580.802206249] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<opennav_docking::DockingServer>
+[component_container_isolated-6] [INFO] [1793294580.811950234] [lifecycle_manager_localization]: Server amcl connected with bond.
+[component_container_isolated-6] [INFO] [1793294580.812007312] [lifecycle_manager_localization]: [34m[1mManaged nodes are active[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.812026148] [lifecycle_manager_localization]: [34m[1mCreating bond timer...[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.818458993] [docking_server]: 
+[component_container_isolated-6] 	docking_server lifecycle node launched. 
+[component_container_isolated-6] 	Waiting on external lifecycle transitions to activate
+[component_container_isolated-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[component_container_isolated-6] [INFO] [1793294580.818552960] [docking_server]: Creating docking_server
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/docking_server' in container '/nav2_container'
+[component_container_isolated-6] [INFO] [1793294580.826196621] [nav2_container]: Found class: rclcpp_components::NodeFactoryTemplate<nav2_lifecycle_manager::LifecycleManager>
+[component_container_isolated-6] [INFO] [1793294580.826252817] [nav2_container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<nav2_lifecycle_manager::LifecycleManager>
+[component_container_isolated-6] [INFO] [1793294580.839344163] [lifecycle_manager_navigation]: Creating
+[INFO] [launch_ros.actions.load_composable_nodes]: Loaded node '/lifecycle_manager_navigation' in container '/nav2_container'
+[component_container_isolated-6] [INFO] [1793294580.841551349] [lifecycle_manager_navigation]: [34m[1mCreating and initializing lifecycle service clients[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.865889869] [lifecycle_manager_navigation]: [34m[1mStarting managed nodes bringup...[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.865957497] [lifecycle_manager_navigation]: [34m[1mConfiguring controller_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.866177131] [controller_server]: Configuring controller interface
+[component_container_isolated-6] [INFO] [1793294580.866211697] [controller_server]: getting progress checker plugins..
+[component_container_isolated-6] [INFO] [1793294580.866556999] [controller_server]: getting goal checker plugins..
+[component_container_isolated-6] [INFO] [1793294580.866700630] [controller_server]: Controller frequency set to 20.0000Hz
+[component_container_isolated-6] [INFO] [1793294580.866762937] [local_costmap.local_costmap]: Configuring
+[component_container_isolated-6] [INFO] [1793294580.874793148] [local_costmap.local_costmap]: Using plugin "voxel_layer"
+[component_container_isolated-6] [INFO] [1793294580.881982300] [local_costmap.local_costmap]: Subscribed to Topics: scan
+[component_container_isolated-6] [INFO] [1793294580.888529411] [local_costmap.local_costmap]: Initialized plugin "voxel_layer"
+[component_container_isolated-6] [INFO] [1793294580.888558987] [local_costmap.local_costmap]: Using plugin "inflation_layer"
+[component_container_isolated-6] [INFO] [1793294580.889263998] [local_costmap.local_costmap]: Initialized plugin "inflation_layer"
+[component_container_isolated-6] [INFO] [1793294580.908963379] [controller_server]: Created progress_checker : progress_checker of type nav2_controller::SimpleProgressChecker
+[component_container_isolated-6] [INFO] [1793294580.909463774] [controller_server]: Controller Server has progress_checker  progress checkers available.
+[component_container_isolated-6] [INFO] [1793294580.910075409] [controller_server]: Created goal checker : general_goal_checker of type nav2_controller::SimpleGoalChecker
+[component_container_isolated-6] [INFO] [1793294580.910674680] [controller_server]: Controller Server has general_goal_checker  goal checkers available.
+[component_container_isolated-6] [INFO] [1793294580.912338601] [controller_server]: Created controller : FollowPath of type nav2_mppi_controller::MPPIController
+[component_container_isolated-6] [INFO] [1793294580.914607755] [controller_server]: Controller period is equal to model dt. Control sequence shifting is ON
+[component_container_isolated-6] [INFO] [1793294580.916585228] [controller_server]: ConstraintCritic instantiated with 1 power and 4.000000 weight.
+[component_container_isolated-6] [INFO] [1793294580.916610306] [controller_server]: Critic loaded : mppi::critics::ConstraintCritic
+[component_container_isolated-6] [INFO] [1793294580.917544720] [controller_server]: InflationCostCritic instantiated with 1 power and 300.000000 / 0.015000 weights. Critic will collision check based on circular cost.
+[component_container_isolated-6] [INFO] [1793294580.917569446] [controller_server]: Critic loaded : mppi::critics::CostCritic
+[component_container_isolated-6] [INFO] [1793294580.918020849] [controller_server]: GoalCritic instantiated with 1 power and 5.000000 weight.
+[component_container_isolated-6] [INFO] [1793294580.918037861] [controller_server]: Critic loaded : mppi::critics::GoalCritic
+[component_container_isolated-6] [INFO] [1793294580.918626041] [controller_server]: GoalAngleCritic instantiated with 1 power, 3.000000 weight, 0.500000 angular threshold and symmetric_yaw_tolerance disabled
+[component_container_isolated-6] [INFO] [1793294580.918655557] [controller_server]: Critic loaded : mppi::critics::GoalAngleCritic
+[component_container_isolated-6] [INFO] [1793294580.919519739] [controller_server]: ReferenceTrajectoryCritic instantiated with 1 power and 14.000000 weight
+[component_container_isolated-6] [INFO] [1793294580.919539626] [controller_server]: Critic loaded : mppi::critics::PathAlignCritic
+[component_container_isolated-6] [INFO] [1793294580.920075969] [controller_server]: Critic loaded : mppi::critics::PathFollowCritic
+[component_container_isolated-6] [INFO] [1793294580.920804444] [controller_server]: PathAngleCritic instantiated with 1 power and 2.000000 weight. Mode set to: Forward Preference
+[component_container_isolated-6] [INFO] [1793294580.920822208] [controller_server]: Critic loaded : mppi::critics::PathAngleCritic
+[component_container_isolated-6] [INFO] [1793294580.921216021] [controller_server]: PreferForwardCritic instantiated with 1 power and 5.000000 weight.
+[component_container_isolated-6] [INFO] [1793294580.921230027] [controller_server]: Critic loaded : mppi::critics::PreferForwardCritic
+[component_container_isolated-6] [INFO] [1793294580.924783476] [controller_server]: Optimizer reset
+[component_container_isolated-6] [INFO] [1793294580.931201142] [MPPIController]: Configured MPPI Controller: FollowPath
+[component_container_isolated-6] [INFO] [1793294580.931233634] [controller_server]: Controller Server has FollowPath  controllers available.
+[component_container_isolated-6] [INFO] [1793294580.944830033] [lifecycle_manager_navigation]: [34m[1mConfiguring smoother_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.945003000] [smoother_server]: Configuring smoother server
+[component_container_isolated-6] [INFO] [1793294580.953078094] [smoother_server]: Created smoother : simple_smoother of type nav2_smoother::SimpleSmoother
+[component_container_isolated-6] [INFO] [1793294580.954333885] [smoother_server]: Smoother Server has simple_smoother  smoothers available.
+[component_container_isolated-6] [INFO] [1793294580.962583650] [lifecycle_manager_navigation]: [34m[1mConfiguring planner_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294580.962720839] [planner_server]: Configuring
+[component_container_isolated-6] [INFO] [1793294580.962792084] [global_costmap.global_costmap]: Configuring
+[component_container_isolated-6] [INFO] [1793294580.969492244] [global_costmap.global_costmap]: Using plugin "static_layer"
+[component_container_isolated-6] [INFO] [1793294580.970815963] [global_costmap.global_costmap]: Subscribing to the map topic (/map) with transient local durability
+[component_container_isolated-6] [INFO] [1793294580.972139582] [global_costmap.global_costmap]: Initialized plugin "static_layer"
+[component_container_isolated-6] [INFO] [1793294580.972170971] [global_costmap.global_costmap]: Using plugin "obstacle_layer"
+[component_container_isolated-6] [INFO] [1793294580.973205103] [global_costmap.global_costmap]: Subscribed to Topics: scan
+[component_container_isolated-6] [INFO] [1793294580.978095185] [global_costmap.global_costmap]: Initialized plugin "obstacle_layer"
+[component_container_isolated-6] [INFO] [1793294580.978128789] [global_costmap.global_costmap]: Using plugin "inflation_layer"
+[component_container_isolated-6] [INFO] [1793294580.979131983] [global_costmap.global_costmap]: Initialized plugin "inflation_layer"
+[component_container_isolated-6] [INFO] [1793294581.002893002] [planner_server]: Created global planner plugin GridBased of type nav2_navfn_planner::NavfnPlanner
+[component_container_isolated-6] [INFO] [1793294581.002956151] [planner_server]: Configuring plugin GridBased of type NavfnPlanner
+[component_container_isolated-6] [INFO] [1793294581.003991035] [planner_server]: Planner Server has GridBased  planners available.
+[component_container_isolated-6] [INFO] [1793294581.013322152] [lifecycle_manager_navigation]: [34m[1mConfiguring route_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294581.013428332] [route_server]: Configuring
+[component_container_isolated-6] [INFO] [1793294581.035947186] [route_server]: Created GraphFileLoader GeoJsonGraphFileLoader of type nav2_route::GeoJsonGraphFileLoader
+[component_container_isolated-6] [INFO] [1793294581.035983635] [route_server]: Configuring geojson graph file loader
+[component_container_isolated-6] [INFO] [1793294581.035993584] [route_server]: No graph file provided to load yet.
+[component_container_isolated-6] [INFO] [1793294581.038772771] [route_server]: Created edge cost function plugin DistanceScorer of type nav2_route::DistanceScorer
+[component_container_isolated-6] [INFO] [1793294581.038798820] [route_server]: Configuring distance scorer.
+[component_container_isolated-6] [INFO] [1793294581.039162486] [route_server]: Created edge cost function plugin CostmapScorer of type nav2_route::CostmapScorer
+[component_container_isolated-6] [INFO] [1793294581.039174840] [route_server]: Configuring costmap scorer.
+[component_container_isolated-6] [INFO] [1793294581.041998541] [global_costmap.global_costmap]: StaticLayer: Resizing costmap to 384 X 384 at 0.050000 m/pix
+[component_container_isolated-6] [INFO] [1793294581.042043285] [route_server]: Created route operation AdjustSpeedLimit of type nav2_route::AdjustSpeedLimit
+[component_container_isolated-6] [INFO] [1793294581.042067140] [route_server]: Configuring Adjust speed limit operation.
+[component_container_isolated-6] [INFO] [1793294581.043225176] [route_server]: Created route operation ReroutingService of type nav2_route::ReroutingService
+[component_container_isolated-6] [INFO] [1793294581.043245054] [route_server]: Configuring Rerouting service operation.
+[component_container_isolated-6] [INFO] [1793294581.044465027] [route_server]: Created route operation CollisionMonitor of type nav2_route::CollisionMonitor
+[component_container_isolated-6] [INFO] [1793294581.044586987] [route_server]: Using costmap topic: local_costmap/costmap_raw instead of server costmap topic: global_costmap/costmap_raw for CollisionMonitor.
+[component_container_isolated-6] [INFO] [1793294581.048159823] [lifecycle_manager_navigation]: [34m[1mConfiguring behavior_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294581.048308894] [behavior_server]: Configuring
+[component_container_isolated-6] [INFO] [1793294581.051025683] [behavior_server]: Creating behavior plugin spin of type nav2_behaviors::Spin
+[component_container_isolated-6] [INFO] [1793294581.052282646] [behavior_server]: Creating behavior plugin backup of type nav2_behaviors::BackUp
+[component_container_isolated-6] [INFO] [1793294581.053538167] [behavior_server]: Creating behavior plugin drive_on_heading of type nav2_behaviors::DriveOnHeading
+[component_container_isolated-6] [INFO] [1793294581.055403298] [behavior_server]: Creating behavior plugin assisted_teleop of type nav2_behaviors::AssistedTeleop
+[component_container_isolated-6] [INFO] [1793294581.058751630] [behavior_server]: Creating behavior plugin wait of type nav2_behaviors::Wait
+[component_container_isolated-6] [INFO] [1793294581.063399284] [behavior_server]: Configuring spin
+[component_container_isolated-6] [INFO] [1793294581.071148404] [behavior_server]: Configuring backup
+[component_container_isolated-6] [INFO] [1793294581.075984544] [behavior_server]: Configuring drive_on_heading
+[component_container_isolated-6] [INFO] [1793294581.082359269] [behavior_server]: Configuring assisted_teleop
+[component_container_isolated-6] [INFO] [1793294581.091453539] [behavior_server]: Configuring wait
+[component_container_isolated-6] [INFO] [1793294581.098450278] [lifecycle_manager_navigation]: [34m[1mConfiguring velocity_smoother[0m[0m
+[component_container_isolated-6] [INFO] [1793294581.098653422] [velocity_smoother]: Configuring velocity smoother
+[component_container_isolated-6] [INFO] [1793294581.103498789] [lifecycle_manager_navigation]: [34m[1mConfiguring collision_monitor[0m[0m
+[component_container_isolated-6] [INFO] [1793294581.103752007] [collision_monitor]: Configuring
+[component_container_isolated-6] [INFO] [1793294581.108573220] [collision_monitor]: [scan]: Creating Scan
+[component_container_isolated-6] [INFO] [1793294581.109967672] [collision_monitor]: [FootprintApproach]: Creating Polygon
+[component_container_isolated-6] [INFO] [1793294581.110184973] [collision_monitor]: [FootprintApproach]: Polygon points are not defined. Using dynamic subscription instead.
+[component_container_isolated-6] [INFO] [1793294581.111153741] [collision_monitor]: [FootprintApproach]: Making footprint subscriber on /local_costmap/published_footprint topic
+[component_container_isolated-6] [INFO] [1793294581.116169711] [lifecycle_manager_navigation]: [34m[1mConfiguring bt_navigator[0m[0m
+[component_container_isolated-6] [INFO] [1793294581.116283035] [bt_navigator]: Configuring
+[component_container_isolated-6] [INFO] [1793294581.119637669] [bt_navigator]: Creating navigator id navigate_to_pose of type nav2_bt_navigator::NavigateToPoseNavigator
+[create-3] [INFO] [1793294581.130518591] [ros_gz_sim]: Entity creation successful.
+[component_container_isolated-6] [INFO] [1793294581.241312693] [bt_navigator]: Creating navigator id navigate_through_poses of type nav2_bt_navigator::NavigateThroughPosesNavigator
+[INFO] [create-3]: process has finished cleanly [pid 51]
+[component_container_isolated-6] [INFO] [1793294581.280628850] [lifecycle_manager_navigation]: [34m[1mConfiguring waypoint_follower[0m[0m
+[component_container_isolated-6] [INFO] [1793294581.280775216] [waypoint_follower]: Configuring
+[parameter_bridge-2] [INFO] [1793294581.281254240] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/clock (gz.msgs.Clock) -> /clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1793294581.282488380] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/joint_states (gz.msgs.Model) -> joint_states (sensor_msgs/msg/JointState)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1793294581.285926081] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/odom (gz.msgs.Odometry) -> odom (nav_msgs/msg/Odometry)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1793294581.289342430] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/tf (gz.msgs.Pose_V) -> tf (tf2_msgs/msg/TFMessage)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1793294581.292119904] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/imu (gz.msgs.IMU) -> imu (sensor_msgs/msg/Imu)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1793294581.292937227] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/scan (gz.msgs.LaserScan) -> scan (sensor_msgs/msg/LaserScan)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1793294581.293701240] [ros_gz_bridge]: Creating ROS->GZ Bridge: [cmd_vel (geometry_msgs/msg/Twist) -> /cmd_vel (gz.msgs.Twist)] (Lazy 0)
+[component_container_isolated-6] [INFO] [1793294581.302071021] [waypoint_follower]: Created waypoint_task_executor : wait_at_waypoint of type nav2_waypoint_follower::WaitAtWaypoint
+[component_container_isolated-6] [INFO] [1793294581.303145269] [lifecycle_manager_navigation]: [34m[1mConfiguring docking_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294581.303246070] [docking_server]: Configuring docking_server
+[component_container_isolated-6] [INFO] [1793294581.303295082] [docking_server]: Controller frequency set to 50.0000Hz
+[component_container_isolated-6] [INFO] [1793294581.322113951] [docking_server]: Created charging dock plugin simple_charging_dock of type opennav_docking::SimpleChargingDock
+[component_container_isolated-6] [WARN] [1793294581.327808662] [docking_server]: Dock database filepath nor dock parameters set. Docking actions can only be executed specifying the dock pose via the action request. Or update the dock database via the reload_database service.
+[component_container_isolated-6] [INFO] [1793294581.327841825] [docking_server]: Docking Server has 1 dock types and 0 dock instances available.
+[component_container_isolated-6] [INFO] [1793294581.329267486] [lifecycle_manager_navigation]: [34m[1mActivating controller_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294581.329382123] [controller_server]: Activating
+[component_container_isolated-6] [INFO] [1793294581.329413272] [local_costmap.local_costmap]: Activating
+[component_container_isolated-6] [INFO] [1793294581.329422489] [local_costmap.local_costmap]: Checking transform
+[component_container_isolated-6] [INFO] [1793294581.329456603] [local_costmap.local_costmap]: Timed out waiting for transform from base_link to odom to become available, tf error: Invalid frame ID "odom" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294581.829549868] [local_costmap.local_costmap]: Timed out waiting for transform from base_link to odom to become available, tf error: Invalid frame ID "odom" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294582.329582239] [local_costmap.local_costmap]: Timed out waiting for transform from base_link to odom to become available, tf error: Invalid frame ID "odom" passed to canTransform argument target_frame - frame does not exist
+[gz-4] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="turtlebot3_waffle"]/link[@name="imu_link"]/sensor[@name="tb3_imu"]/gz_frame_id:<data-string>:L49]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+[gz-4] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="turtlebot3_waffle"]/link[@name="base_scan"]/sensor[@name="hls_lfcd_lds"]/gz_frame_id:<data-string>:L134]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+[gz-4] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="turtlebot3_waffle"]/link[@name="camera_link"]/sensor[@name="intel_realsense_r200_depth"]/gz_frame_id:<data-string>:L361]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+[gz-4] amdgpu: os_same_file_description couldn't determine if two DRM fds reference the same file description.
+[gz-4] If they do, bad things may happen!
+[component_container_isolated-6] [INFO] [1793294582.829581096] [local_costmap.local_costmap]: Timed out waiting for transform from base_link to odom to become available, tf error: Invalid frame ID "odom" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294583.329704730] [local_costmap.local_costmap]: start
+[component_container_isolated-6] [INFO] [1793294583.357182837] [amcl]: createLaserObject
+[component_container_isolated-6] [WARN] [1793294583.531276626] [controller_server]: Parameter controller_server.verbose not found
+[component_container_isolated-6] [INFO] [1793294583.534971282] [controller_server]: Optimizer reset
+[component_container_isolated-6] [INFO] [1793294583.535538783] [MPPIController]: Activated MPPI Controller: FollowPath
+[component_container_isolated-6] [INFO] [1793294583.535622150] [controller_server]: Creating bond (controller_server) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294583.641602265] [lifecycle_manager_navigation]: Server controller_server connected with bond.
+[component_container_isolated-6] [INFO] [1793294583.641643883] [lifecycle_manager_navigation]: [34m[1mActivating smoother_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294583.641917770] [smoother_server]: Activating
+[component_container_isolated-6] [INFO] [1793294583.642000026] [smoother_server]: Creating bond (smoother_server) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294583.748620439] [lifecycle_manager_navigation]: Server smoother_server connected with bond.
+[component_container_isolated-6] [INFO] [1793294583.748668059] [lifecycle_manager_navigation]: [34m[1mActivating planner_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294583.748944571] [planner_server]: Activating
+[component_container_isolated-6] [INFO] [1793294583.748985338] [global_costmap.global_costmap]: Activating
+[component_container_isolated-6] [INFO] [1793294583.748994435] [global_costmap.global_costmap]: Checking transform
+[component_container_isolated-6] [INFO] [1793294583.749007490] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294584.249085318] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294584.749088296] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[INFO] [patrol.py-7]: process started with pid [278]
+[component_container_isolated-6] [WARN] [1793294585.157369841] [amcl]: AMCL cannot publish a pose or update the transform. Please set the initial pose...
+[component_container_isolated-6] [INFO] [1793294585.249100463] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294585.749072234] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294586.249080063] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294586.749076391] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[patrol.py-7] [INFO] [1793294586.847939510] [patrol]: Publishing Initial Pose
+[patrol.py-7] [INFO] [1793294586.849404876] [patrol]: Initial pose set to (-2.0, -0.5)
+[patrol.py-7] [INFO] [1793294586.850277283] [patrol]: Waiting for Nav2 to become active...
+[component_container_isolated-6] [WARN] [1793294587.173665755] [amcl]: AMCL cannot publish a pose or update the transform. Please set the initial pose...
+[component_container_isolated-6] [INFO] [1793294587.249076527] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294587.749097734] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294588.249074918] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294588.749071900] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [INFO] [1793294589.249072940] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[component_container_isolated-6] [WARN] [1793294589.369581516] [amcl]: AMCL cannot publish a pose or update the transform. Please set the initial pose...
+[patrol.py-7] [INFO] [1793294589.608751860] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.609562610] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.609964579] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.610110464] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.468000 but the latest data is at time 6.444000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.610132095] [amcl]: Setting pose (6.468000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.610364534] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.611193018] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.611909070] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.612122744] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.612178288] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.471000 but the latest data is at time 6.444000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.612198917] [amcl]: Setting pose (6.471000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.612872810] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.613611154] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.614271390] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.614479814] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.614541540] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.471000 but the latest data is at time 6.444000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.614551930] [amcl]: Setting pose (6.471000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.614991730] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.616473427] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.617145366] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.617342478] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.617395258] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.474000 but the latest data is at time 6.444000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.617432698] [amcl]: Setting pose (6.474000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.617837603] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.619235452] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.619891280] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.620108691] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.620196286] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.477000 but the latest data is at time 6.444000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.620249547] [amcl]: Setting pose (6.477000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.620550214] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.622146107] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.622848473] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.623070532] [amcl]: initialPoseReceived
+[component_container_isolated-6] [INFO] [1793294589.623119825] [amcl]: Setting pose (6.480000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.623528397] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.624963386] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.625612151] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.625829822] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.625920202] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.483000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.625937715] [amcl]: Setting pose (6.483000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.626299298] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.627720702] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.628392771] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.628544677] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.628599401] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.486000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.628609249] [amcl]: Setting pose (6.486000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.629078315] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.630915163] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.631563437] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.631741433] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.631808409] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.489000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.631819109] [amcl]: Setting pose (6.489000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.632259030] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.633624287] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.634284684] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.634528084] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.634613034] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.492000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.634623594] [amcl]: Setting pose (6.492000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.634977592] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.636926622] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.637574595] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.637754565] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.637813787] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.495000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.637852089] [amcl]: Setting pose (6.495000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.638269638] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.639778025] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.640452228] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.640658728] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.640714493] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.498000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.640724793] [amcl]: Setting pose (6.498000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.641181355] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.643243277] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.643949721] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.644115544] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.644174786] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.501000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.644185286] [amcl]: Setting pose (6.501000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.644709356] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.646198137] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.646862411] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.647017243] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.647076405] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.504000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.647086053] [amcl]: Setting pose (6.504000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.647538467] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.648871754] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.649501894] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.649627291] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.649677375] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.507000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.649686563] [amcl]: Setting pose (6.507000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.650166178] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.651854355] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.652486038] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.652624489] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.652668392] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.510000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.652676718] [amcl]: Setting pose (6.510000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.653151163] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.655396703] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.656133063] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.656385009] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.656476642] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.513000 but the latest data is at time 6.480000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.656488414] [amcl]: Setting pose (6.513000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.656898769] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.658382199] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.659074817] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.659249777] [amcl]: initialPoseReceived
+[component_container_isolated-6] [INFO] [1793294589.659283782] [amcl]: Setting pose (6.516000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.659791741] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.661125108] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.661787929] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.661984140] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.662070162] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.519000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.662090400] [amcl]: Setting pose (6.519000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.662444459] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.663821308] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.664602523] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.664755261] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.664803843] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.522000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.664813020] [amcl]: Setting pose (6.522000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.665289680] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.666633638] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.667307380] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.667509491] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.667592979] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.525000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.667609620] [amcl]: Setting pose (6.525000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.667976914] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.669667475] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.670323213] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.670486973] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.670532168] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.528000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.670541596] [amcl]: Setting pose (6.528000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.670987377] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.672680414] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.673316715] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.673529086] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.673619326] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.531000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.673636148] [amcl]: Setting pose (6.531000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.673991779] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.675760068] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.676388564] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.676589935] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.676669345] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.534000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.676686367] [amcl]: Setting pose (6.534000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.677038171] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.678698716] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.679342922] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.679532740] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.679625145] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.537000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.679641977] [amcl]: Setting pose (6.537000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.679995955] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.681665016] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.682318370] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.682498761] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.682574073] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.540000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.682654354] [amcl]: Setting pose (6.540000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.682977935] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.684654641] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.685312202] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.685506128] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.685590438] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.543000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.685606828] [amcl]: Setting pose (6.543000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.686060415] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.687835226] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.688457961] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.688676494] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.688773517] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.546000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.688791571] [amcl]: Setting pose (6.546000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.689152983] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.690855598] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.691466962] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.691689262] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.691780474] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.549000 but the latest data is at time 6.516000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.691801093] [amcl]: Setting pose (6.549000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.692152607] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.693871732] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.694481954] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.694661694] [amcl]: initialPoseReceived
+[component_container_isolated-6] [INFO] [1793294589.694705817] [amcl]: Setting pose (6.552000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.695132382] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.697137989] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.697848821] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.698183963] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.698322074] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.555000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.698346400] [amcl]: Setting pose (6.555000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.698604948] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.700079803] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.700747163] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.700962249] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.701044815] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.558000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.701055244] [amcl]: Setting pose (6.558000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.701429331] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.702825005] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.703476505] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.703622321] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.703672836] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.561000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.703686121] [amcl]: Setting pose (6.561000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.704144747] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.705826883] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.706447304] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.706572671] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.706622244] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.564000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.706631953] [amcl]: Setting pose (6.564000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.707178945] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.708439756] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.709074785] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.709249795] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.709302384] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.567000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.709311602] [amcl]: Setting pose (6.567000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.709765539] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.711648313] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.712310363] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.712451179] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.712497487] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.570000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.712507285] [amcl]: Setting pose (6.570000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.712980989] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.714620896] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.715271384] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.715464608] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.715539069] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.573000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.715550050] [amcl]: Setting pose (6.573000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.715968690] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.717720247] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.718375454] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.718558109] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.718615176] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.576000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.718648720] [amcl]: Setting pose (6.576000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.719038556] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.720746280] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.721372793] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.721544157] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.721595674] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.579000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.721605432] [amcl]: Setting pose (6.579000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.722027489] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.723789786] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.724413364] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.724630363] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.724678434] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.582000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.724688022] [amcl]: Setting pose (6.582000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.725152930] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.726938401] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.727557319] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.727713354] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.727769249] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.585000 but the latest data is at time 6.552000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.727779218] [amcl]: Setting pose (6.585000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.728238275] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.729623771] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.730269971] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.730389687] [amcl]: initialPoseReceived
+[component_container_isolated-6] [INFO] [1793294589.730416397] [amcl]: Setting pose (6.588000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.730945276] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.732668910] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.733319568] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.733480211] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.733530206] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.591000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.733540165] [amcl]: Setting pose (6.591000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.733990264] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.736292441] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.737043248] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.737302568] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.737394952] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.594000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.737407315] [amcl]: Setting pose (6.594000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.737777815] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.739221671] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.739880665] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.740028885] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.740079400] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.597000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.740088838] [amcl]: Setting pose (6.597000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.740545170] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.742125423] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.742904123] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.743077691] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.743138005] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.600000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.743151991] [amcl]: Setting pose (6.600000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.743654340] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.745048171] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.745689422] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.745844404] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.745898326] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.603000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.745936909] [amcl]: Setting pose (6.603000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.746390335] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.747707622] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.748350275] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.748541346] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.748594296] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.606000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.748604265] [amcl]: Setting pose (6.606000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.749052050] [patrol]: Waiting for amcl_pose to be received
+[component_container_isolated-6] [INFO] [1793294589.749073220] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Invalid frame ID "map" passed to canTransform argument target_frame - frame does not exist
+[patrol.py-7] [INFO] [1793294589.750932120] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.751590132] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.751762357] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.751814736] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.609000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.751824544] [amcl]: Setting pose (6.609000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.752285855] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.753628410] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.754281713] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.754449921] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.754495978] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.612000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.754505296] [amcl]: Setting pose (6.612000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.754962018] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.756613456] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.757247944] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.757402966] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.757444084] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.615000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.757452870] [amcl]: Setting pose (6.615000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.757913991] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.759610084] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.760256734] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.760492880] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.760574174] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.618000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.760596035] [amcl]: Setting pose (6.618000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.760924014] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.762636507] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.763306182] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.763463990] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.763509145] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.621000 but the latest data is at time 6.588000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.763518763] [amcl]: Setting pose (6.621000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.763963112] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.765715160] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.766365217] [patrol]: Publishing Initial Pose
+[patrol.py-7] [INFO] [1793294589.767025183] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.768738808] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.769391260] [patrol]: Publishing Initial Pose
+[patrol.py-7] [INFO] [1793294589.770058570] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.772049088] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.772717560] [patrol]: Publishing Initial Pose
+[patrol.py-7] [INFO] [1793294589.773483025] [patrol]: Waiting for amcl_pose to be received
+[patrol.py-7] [INFO] [1793294589.774843804] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.775526673] [patrol]: Publishing Initial Pose
+[patrol.py-7] [INFO] [1793294589.776202229] [patrol]: Waiting for amcl_pose to be received
+[component_container_isolated-6] [INFO] [1793294589.776722401] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.776809074] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation into the future.  Requested time 6.633000 but the latest data is at time 6.624000, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.776824443] [amcl]: Setting pose (6.633000): -2.000 -0.500 0.000
+[component_container_isolated-6] [INFO] [1793294589.777406793] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.777437831] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation at time 6.636000, but only time 7.600000 is in the buffer, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.777444785] [amcl]: Setting pose (6.636000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.777573638] [patrol]: Setting initial pose
+[patrol.py-7] [INFO] [1793294589.778233063] [patrol]: Publishing Initial Pose
+[component_container_isolated-6] [INFO] [1793294589.778439432] [amcl]: initialPoseReceived
+[component_container_isolated-6] [WARN] [1793294589.778490859] [amcl]: Failed to transform initial pose in time (Lookup would require extrapolation at time 6.636000, but only time 7.600000 is in the buffer, when looking up transform from frame [base_footprint] to frame [odom])
+[component_container_isolated-6] [INFO] [1793294589.778497552] [amcl]: Setting pose (6.636000): -2.000 -0.500 0.000
+[patrol.py-7] [INFO] [1793294589.778924178] [patrol]: Waiting for amcl_pose to be received
+[component_container_isolated-6] [INFO] [1793294590.249090373] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Lookup would require extrapolation into the past.  Requested time 7.092000 but the earliest data is at time 7.600000, when looking up transform from frame [base_link] to frame [map]
+[component_container_isolated-6] [INFO] [1793294590.749079843] [global_costmap.global_costmap]: Timed out waiting for transform from base_link to map to become available, tf error: Lookup would require extrapolation into the past.  Requested time 7.596000 but the earliest data is at time 7.600000, when looking up transform from frame [base_link] to frame [map]
+[component_container_isolated-6] [INFO] [1793294591.249160917] [global_costmap.global_costmap]: start
+[component_container_isolated-6] [INFO] [1793294592.300525285] [planner_server]: Activating plugin GridBased of type NavfnPlanner
+[component_container_isolated-6] [INFO] [1793294592.302353447] [planner_server]: Creating bond (planner_server) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294592.407304491] [lifecycle_manager_navigation]: Server planner_server connected with bond.
+[component_container_isolated-6] [INFO] [1793294592.407345438] [lifecycle_manager_navigation]: [34m[1mActivating route_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294592.407768607] [route_server]: Activating
+[component_container_isolated-6] [INFO] [1793294592.408068874] [route_server]: Creating bond (route_server) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294592.515052967] [lifecycle_manager_navigation]: Server route_server connected with bond.
+[component_container_isolated-6] [INFO] [1793294592.515093553] [lifecycle_manager_navigation]: [34m[1mActivating behavior_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294592.515429989] [behavior_server]: Activating
+[component_container_isolated-6] [INFO] [1793294592.515460095] [behavior_server]: Activating spin
+[component_container_isolated-6] [INFO] [1793294592.515487006] [behavior_server]: Activating backup
+[component_container_isolated-6] [INFO] [1793294592.515497496] [behavior_server]: Activating drive_on_heading
+[component_container_isolated-6] [INFO] [1793294592.515507815] [behavior_server]: Activating assisted_teleop
+[component_container_isolated-6] [INFO] [1793294592.515517283] [behavior_server]: Activating wait
+[component_container_isolated-6] [INFO] [1793294592.515534877] [behavior_server]: Creating bond (behavior_server) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294592.621213263] [lifecycle_manager_navigation]: Server behavior_server connected with bond.
+[component_container_isolated-6] [INFO] [1793294592.621285540] [lifecycle_manager_navigation]: [34m[1mActivating velocity_smoother[0m[0m
+[component_container_isolated-6] [INFO] [1793294592.621640400] [velocity_smoother]: Activating
+[component_container_isolated-6] [INFO] [1793294592.621689713] [velocity_smoother]: Creating bond (velocity_smoother) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294592.728124879] [lifecycle_manager_navigation]: Server velocity_smoother connected with bond.
+[component_container_isolated-6] [INFO] [1793294592.728163051] [lifecycle_manager_navigation]: [34m[1mActivating collision_monitor[0m[0m
+[component_container_isolated-6] [INFO] [1793294592.728530345] [collision_monitor]: Activating
+[component_container_isolated-6] [INFO] [1793294592.728626015] [collision_monitor]: Creating bond (collision_monitor) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294592.836767162] [lifecycle_manager_navigation]: Server collision_monitor connected with bond.
+[component_container_isolated-6] [INFO] [1793294592.836829760] [lifecycle_manager_navigation]: [34m[1mActivating bt_navigator[0m[0m
+[component_container_isolated-6] [INFO] [1793294592.837243842] [bt_navigator]: Activating
+[component_container_isolated-6] [INFO] [1793294592.930283137] [bt_navigator]: Creating bond (bt_navigator) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294593.037527341] [lifecycle_manager_navigation]: Server bt_navigator connected with bond.
+[component_container_isolated-6] [INFO] [1793294593.037575943] [lifecycle_manager_navigation]: [34m[1mActivating waypoint_follower[0m[0m
+[component_container_isolated-6] [INFO] [1793294593.037903301] [waypoint_follower]: Activating
+[component_container_isolated-6] [INFO] [1793294593.037971169] [waypoint_follower]: Creating bond (waypoint_follower) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294593.146635263] [lifecycle_manager_navigation]: Server waypoint_follower connected with bond.
+[component_container_isolated-6] [INFO] [1793294593.146680889] [lifecycle_manager_navigation]: [34m[1mActivating docking_server[0m[0m
+[component_container_isolated-6] [INFO] [1793294593.146973842] [docking_server]: Activating docking_server
+[component_container_isolated-6] [INFO] [1793294593.158526053] [docking_server]: Creating bond (docking_server) to lifecycle manager.
+[component_container_isolated-6] [INFO] [1793294593.267117329] [lifecycle_manager_navigation]: Server docking_server connected with bond.
+[component_container_isolated-6] [INFO] [1793294593.267175469] [lifecycle_manager_navigation]: [34m[1mManaged nodes are active[0m[0m
+[component_container_isolated-6] [INFO] [1793294593.267235332] [lifecycle_manager_navigation]: [34m[1mCreating bond timer...[0m[0m
+[patrol.py-7] [INFO] [1793294595.786655836] [patrol]: Nav2 is ready for use!
+[patrol.py-7] [INFO] [1793294595.787593487] [patrol]: [loop 1/1] Heading to north_west
+[patrol.py-7] [INFO] [1793294595.788495590] [patrol]: Navigating to goal: -0.6 1.85...
+[component_container_isolated-6] [INFO] [1793294595.789516898] [bt_navigator]: Begin navigating from current location (-2.00, -0.50) to (-0.60, 1.85)
+[component_container_isolated-6] [INFO] [1793294595.810353467] [controller_server]: Received a goal, begin computing control effort.
+[component_container_isolated-6] [WARN] [1793294595.810400596] [controller_server]: No goal checker was specified in parameter 'current_goal_checker'. Server will use only plugin loaded general_goal_checker . This warning will appear once.
+[component_container_isolated-6] [WARN] [1793294595.810416205] [controller_server]: No progress checker was specified in parameter 'current_progress_checker'. Server will use only plugin loaded progress_checker . This warning will appear once.
+[parameter_bridge-2] [INFO] [1793294595.852668747] [ros_gz_bridge]: Passing message from ROS geometry_msgs/msg/Twist to Gazebo gz.msgs.Twist (showing msg only once per type)
+[patrol.py-7] [INFO] [1793294595.891280555] [patrol]:   north_west: 3.11 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294596.860544522] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294597.910569438] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294598.903650967] [patrol]:   north_west: 3.01 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294598.910544913] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294599.960545197] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294600.960545234] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294601.915694957] [patrol]:   north_west: 2.22 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294602.010706517] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294603.010540767] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294604.060544208] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294604.927645643] [patrol]:   north_west: 1.15 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294605.060609559] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294606.110543074] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294607.110575628] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294607.260596518] [controller_server]: Reached the goal!
+[component_container_isolated-6] [INFO] [1793294607.260896585] [controller_server]: Optimizer reset
+[component_container_isolated-6] [INFO] [1793294607.289944467] [bt_navigator]: Goal succeeded
+[patrol.py-7] [INFO] [1793294607.292931196] [patrol]:   north_west: SUCCEEDED in 11.5 s (0 recoveries)
+[patrol.py-7] [INFO] [1793294607.293815946] [patrol]: [loop 1/1] Heading to east
+[patrol.py-7] [INFO] [1793294607.295079993] [patrol]: Navigating to goal: 1.95 0.55...
+[component_container_isolated-6] [INFO] [1793294607.295740330] [bt_navigator]: Begin navigating from current location (-0.80, 1.73) to (1.95, 0.55)
+[component_container_isolated-6] [INFO] [1793294607.316487961] [controller_server]: Received a goal, begin computing control effort.
+[patrol.py-7] [INFO] [1793294607.399700167] [patrol]:   east: 3.35 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294608.366663679] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294609.416659240] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294610.411806920] [patrol]:   east: 2.22 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294610.416662638] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294611.466692198] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294612.466657088] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294613.422430837] [patrol]:   east: 0.82 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294613.516657950] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294614.516692907] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294615.216746585] [controller_server]: Reached the goal!
+[component_container_isolated-6] [INFO] [1793294615.217090946] [controller_server]: Optimizer reset
+[component_container_isolated-6] [INFO] [1793294615.246045913] [bt_navigator]: Goal succeeded
+[patrol.py-7] [INFO] [1793294615.247508965] [patrol]:   east: SUCCEEDED in 8.0 s (0 recoveries)
+[patrol.py-7] [INFO] [1793294615.248048604] [patrol]: [loop 1/1] Heading to south
+[patrol.py-7] [INFO] [1793294615.248754507] [patrol]: Navigating to goal: 0.0 -1.85...
+[component_container_isolated-6] [INFO] [1793294615.249273988] [bt_navigator]: Begin navigating from current location (1.83, 0.76) to (0.00, -1.85)
+[component_container_isolated-6] [INFO] [1793294615.270034865] [controller_server]: Received a goal, begin computing control effort.
+[patrol.py-7] [INFO] [1793294615.351261032] [patrol]:   south: 3.92 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294616.320208901] [controller_server]: Passing new path to controller.
+[patrol.py-7] [WARN] [1793294616.857507446] [patrol]: Spawning unmapped obstacle 'surprise_box' at (1.8, -0.9)
+[component_container_isolated-6] [INFO] [1793294617.370254006] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294617.552235563] [collision_monitor]: Robot to approach for 1.200000 seconds away from collision
+[component_container_isolated-6] [INFO] [1793294617.776558932] [controller_server]: Optimizer reset
+[component_container_isolated-6] [INFO] [1793294617.784981043] [controller_server]: Optimizer reset
+[component_container_isolated-6] [WARN] [1793294617.785087304] [controller_server]: Optimizer fail to compute path
+[component_container_isolated-6] [INFO] [1793294617.842141494] [collision_monitor]: Robot to continue normal operation
+[patrol.py-7] [INFO] [1793294618.363270332] [patrol]:   south: 2.74 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294618.370204724] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294619.420203417] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294620.420206249] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294621.376345948] [patrol]:   south: 2.64 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294621.420249821] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294622.470204058] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294623.470201918] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294624.386939982] [patrol]:   south: 1.65 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294624.520220822] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294625.520201354] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294626.570211518] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294627.399347551] [patrol]:   south: 0.87 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294627.620221383] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294628.620205099] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294629.670234036] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294630.411358164] [patrol]:   south: 0.25 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294630.670208790] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294631.070252297] [controller_server]: Reached the goal!
+[component_container_isolated-6] [INFO] [1793294631.070539219] [controller_server]: Optimizer reset
+[component_container_isolated-6] [INFO] [1793294631.099701830] [bt_navigator]: Goal succeeded
+[patrol.py-7] [INFO] [1793294631.104288851] [patrol]:   south: SUCCEEDED in 15.9 s (0 recoveries)
+[patrol.py-7] [INFO] [1793294631.105487023] [patrol]: [loop 1/1] Heading to centre
+[patrol.py-7] [INFO] [1793294631.106744277] [patrol]: Navigating to goal: -0.55 -0.55...
+[component_container_isolated-6] [INFO] [1793294631.107300096] [bt_navigator]: Begin navigating from current location (0.09, -1.86) to (-0.55, -0.55)
+[component_container_isolated-6] [INFO] [1793294631.127814859] [controller_server]: Received a goal, begin computing control effort.
+[patrol.py-7] [INFO] [1793294631.211442734] [patrol]:   centre: 1.75 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294632.177967295] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294633.177982752] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294634.223225004] [patrol]:   centre: 1.17 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294634.228040786] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294635.227970977] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294636.278022172] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294637.235096714] [patrol]:   centre: 0.30 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294637.277963169] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294637.427991224] [controller_server]: Reached the goal!
+[component_container_isolated-6] [INFO] [1793294637.428231457] [controller_server]: Optimizer reset
+[component_container_isolated-6] [INFO] [1793294637.457626257] [bt_navigator]: Goal succeeded
+[patrol.py-7] [INFO] [1793294637.459237439] [patrol]:   centre: SUCCEEDED in 6.4 s (0 recoveries)
+[patrol.py-7] [INFO] [1793294637.459757591] [patrol]: [loop 1/1] Heading to home
+[patrol.py-7] [INFO] [1793294637.460448856] [patrol]: Navigating to goal: -2.0 -0.5...
+[component_container_isolated-6] [INFO] [1793294637.460919545] [bt_navigator]: Begin navigating from current location (-0.55, -0.78) to (-2.00, -0.50)
+[component_container_isolated-6] [INFO] [1793294637.481427275] [controller_server]: Received a goal, begin computing control effort.
+[patrol.py-7] [INFO] [1793294637.563287454] [patrol]:   home: 2.81 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294638.531621787] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294639.531575884] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294640.576672606] [patrol]:   home: 2.77 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294640.581581885] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294641.631587318] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294642.631584543] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294643.587347863] [patrol]:   home: 2.57 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294643.681577838] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294644.681576731] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294645.731581093] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294646.599496474] [patrol]:   home: 2.05 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294646.731577426] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294647.781588916] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294648.781604410] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294649.610878348] [patrol]:   home: 0.95 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294649.831585527] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294650.831595997] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294651.881579855] [controller_server]: Passing new path to controller.
+[patrol.py-7] [INFO] [1793294652.623012234] [patrol]:   home: 0.24 m remaining, 0 recoveries
+[component_container_isolated-6] [INFO] [1793294652.881578647] [controller_server]: Passing new path to controller.
+[component_container_isolated-6] [INFO] [1793294653.781646210] [controller_server]: Reached the goal!
+[component_container_isolated-6] [INFO] [1793294653.781929485] [controller_server]: Optimizer reset
+[component_container_isolated-6] [INFO] [1793294653.811184061] [bt_navigator]: Goal succeeded
+[patrol.py-7] [INFO] [1793294653.813776115] [patrol]:   home: SUCCEEDED in 16.4 s (0 recoveries)
+[patrol.py-7] [INFO] [1793294653.814688778] [patrol]: Trajectory written to /results/trajectory.csv
+[patrol.py-7] [INFO] [1793294653.815354785] [patrol]: ===== Patrol summary =====
+[patrol.py-7] [INFO] [1793294653.815987991] [patrol]:   OK   north_west         11.5 s  0 recoveries
+[patrol.py-7] [INFO] [1793294653.816594296] [patrol]:   OK   east                8.0 s  0 recoveries
+[patrol.py-7] [INFO] [1793294653.817199499] [patrol]:   OK   south              15.9 s  0 recoveries
+[patrol.py-7] [INFO] [1793294653.817806234] [patrol]:   OK   centre              6.4 s  0 recoveries
+[patrol.py-7] [INFO] [1793294653.818402520] [patrol]:   OK   home               16.4 s  0 recoveries
+[patrol.py-7] [INFO] [1793294653.819031898] [patrol]:   5/5 goals reached, 58.0 s driving, 0 recoveries
+[INFO] [patrol.py-7]: process has finished cleanly [pid 278]
