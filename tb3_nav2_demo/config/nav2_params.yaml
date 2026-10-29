@@ -110,10 +110,12 @@ controller_server:
       vx_std: 0.2
       vy_std: 0.2
       wz_std: 0.4
-      vx_max: 0.5
-      vx_min: -0.35
+      # [tuned] Real TurtleBot3 Waffle limits (0.26 m/s, 1.82 rad/s) instead of
+      # the stock 0.5 m/s / 1.9 rad/s, so the config would transfer to hardware.
+      vx_max: 0.26
+      vx_min: -0.26
       vy_max: 0.5
-      wz_max: 1.9
+      wz_max: 1.82
       iteration_count: 1
       prune_distance: 1.7
       transform_tolerance: 0.1
@@ -191,7 +193,9 @@ controller_server:
 local_costmap:
   local_costmap:
     ros__parameters:
-      update_frequency: 5.0
+      # [tuned] 5 -> 10 Hz: obstacles that suddenly appear enter the costmap
+      # (and the MPPI cost critic) faster.
+      update_frequency: 10.0
       publish_frequency: 2.0
       global_frame: odom
       robot_base_frame: base_link
@@ -233,7 +237,9 @@ local_costmap:
 global_costmap:
   global_costmap:
     ros__parameters:
-      update_frequency: 1.0
+      # [tuned] 1 -> 5 Hz: the planner learns about new obstacles sooner, so the
+      # robot reroutes earlier instead of stalling in front of them (README run 6).
+      update_frequency: 5.0
       publish_frequency: 1.0
       global_frame: map
       robot_base_frame: base_link
@@ -365,8 +371,9 @@ velocity_smoother:
     stamp_smoothed_velocity_with_smoothing_time: False
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    max_velocity: [0.5, 0.0, 2.0]
-    min_velocity: [-0.5, 0.0, -2.0]
+    # [tuned] Match the controller / real TB3 Waffle limits.
+    max_velocity: [0.26, 0.0, 1.82]
+    min_velocity: [-0.26, 0.0, -1.82]
     max_accel: [2.5, 0.0, 3.2]
     max_decel: [-2.5, 0.0, -3.2]
     odom_topic: "odom"
