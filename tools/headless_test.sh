@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Headless end-to-end check: Gazebo (no GUI) + Nav2 + patrol, then plot the
+# driven path and verify clearance to every unmapped obstacle.
+# Usage: ./tools/headless_test.sh [params] [loops] [tag]
+#   params: tuned (default) | stock | <file>.yaml in tb3_nav2_demo/config/
+#   -> results/<tag>/ (log, csv, png)
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+PARAMS=${1:-tuned}
+LOOPS=${2:-1}
+TAG=${3:-$PARAMS}
+case $PARAMS in
+  tuned) PARAMS_FILE=nav2_params.yaml ;;
+  stock) PARAMS_FILE=nav2_params_stock.yaml ;;
+  *.yaml) PARAMS_FILE=$PARAMS ;;    # any file in tb3_nav2_demo/config/
+  *) echo "unknown params profile: $PARAMS" >&2; exit 2 ;;
+esac
+OUT="$PWD/results/$TAG"
+mkdir -p "$OUT"
+IMAGE=${IMAGE:-tb3-nav2:latest}
+
+GPU_ARGS=()
+for node in /dev/dri/card* /dev/dri/renderD*; do
+  [[ -e $node ]] || continue
+  drv=$(basename "$(readlink -f "/sys/class/drm/$(basename "$node")/device/driver")" 2>/dev/null || true)
+  [[ $drv == nvidia ]] && continue
+  GPU_ARGS+=(--device "$node")
+done
+
+docker run --rm --ipc=host "${GPU_ARGS[@]}" -v "$OUT":/results \
+  -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e LOOPS="$LOOPS" -e PARAMS_FILE="$PARAMS_FILE" \
+  "$IMAGE" bash -c '
+    log=/results/launch.log
+    ros2 launch tb3_nav2_demo demo.launch.py headless:=True use_rviz:=False \
+        params_file:=$(ros2 pkg prefix tb3_nav2_demo)/share/tb3_nav2_demo/config/$PARAMS_FILE \
+        loops:=$LOOPS trajectory_file:=/results/trajectory.csv > $log 2>&1 &
+    launch_pid=$!
+    deadline=$((SECONDS + 300 * LOOPS))
+    until grep -qE "goals reached|process has died" $log; do
+      (( SECONDS > deadline )) && { echo "TIMEOUT"; break; }
+      sleep 2
+    done
+    grep -E "Patrol summary|OK  |FAIL |goals reached|Spawn|process has died" $log || true
+    status=1
+    if grep -qE " ([0-9]+)/\1 goals reached" $log && ! grep -q "process has died" $log; then
+      echo; ros2 run tb3_nav2_demo plot_trajectory.py /results/trajectory.csv /results/trajectory.png \
+        && status=0
+    fi
+    kill -TERM $launch_pid; wait $launch_pid 2>/dev/null
+    chown -R $HOST_UID:$HOST_GID /results
+    exit $status'

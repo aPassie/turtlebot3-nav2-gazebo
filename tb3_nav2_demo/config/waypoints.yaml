@@ -1,0 +1,22 @@
+# Patrol route for scripts/patrol.py (map frame, metres / radians).
+# Map: nav2_bringup/maps/tb3_sandbox.yaml (TurtleBot3 hexagon world with 3x3 pillars).
+initial_pose: {x: -2.0, y: -0.5, yaw: 0.0}   # matches the Gazebo spawn pose
+
+waypoints:
+  - {name: north_west, x: -0.6,  y: 1.85,  yaw: 0.0}     # crate blocks the direct lane
+  - {name: east,       x: 1.95,  y: 0.55,  yaw: -1.57}   # barrel plugs a pillar gap
+  - name: south
+    x: 0.0
+    y: -1.85
+    yaw: 3.14
+    # An obstacle dropped into the world on the robot's current route once the
+    # robot is within trigger_distance of it. The gaps either side of it are
+    # narrower than the robot, so Nav2 must see it with the LiDAR and replan.
+    spawn:
+      name: surprise_box
+      x: 1.8
+      y: -0.9
+      size: 0.4
+      trigger_distance: 1.2
+  - {name: centre,     x: -0.55, y: -0.55, yaw: 1.57}    # squeeze between pillars
+  - {name: home,       x: -2.0,  y: -0.5,  yaw: 0.0}     # barrier blocks the gap

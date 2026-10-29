@@ -16,6 +16,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 FROM deps AS app
+
+# Tools for the self-contained demo recorder (virtual display + screen capture)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        xvfb ffmpeg xdotool x11-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upstream packaging bug: nav2_minimal_tb3_sim's URDF points at
+# package://nav2_minimal_tb3_sim/models/<mesh>.dae but the meshes are installed
+# under models/turtlebot3_model/meshes/. Link them so RViz can show the robot.
+RUN cd /opt/ros/jazzy/share/nav2_minimal_tb3_sim/models \
+ && for f in turtlebot3_model/meshes/*.dae; do ln -sf "$f" .; done
+
 WORKDIR /ws
 COPY tb3_nav2_demo /ws/src/tb3_nav2_demo
 RUN . /opt/ros/jazzy/setup.sh && colcon build --symlink-install
