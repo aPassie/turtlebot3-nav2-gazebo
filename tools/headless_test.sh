@@ -20,15 +20,9 @@ OUT="$PWD/results/$TAG"
 mkdir -p "$OUT"
 IMAGE=${IMAGE:-tb3-nav2:latest}
 
-GPU_ARGS=()
-for node in /dev/dri/card* /dev/dri/renderD*; do
-  [[ -e $node ]] || continue
-  drv=$(basename "$(readlink -f "/sys/class/drm/$(basename "$node")/device/driver")" 2>/dev/null || true)
-  [[ $drv == nvidia ]] && continue
-  GPU_ARGS+=(--device "$node")
-done
+source docker/gpu_args.sh
 
-docker run --rm --ipc=host "${GPU_ARGS[@]}" -v "$OUT":/results \
+docker run --rm --init --ipc=host "${GPU_ARGS[@]}" -v "$OUT":/results \
   -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e LOOPS="$LOOPS" -e PARAMS_FILE="$PARAMS_FILE" \
   "$IMAGE" bash -c '
     log=/results/launch.log
@@ -39,6 +33,7 @@ docker run --rm --ipc=host "${GPU_ARGS[@]}" -v "$OUT":/results \
     deadline=$((SECONDS + 300 * LOOPS))
     until grep -qE "goals reached|process has died" $log; do
       (( SECONDS > deadline )) && { echo "TIMEOUT"; break; }
+      kill -0 $launch_pid 2>/dev/null || { echo "launch exited early"; break; }
       sleep 2
     done
     grep -E "Patrol summary|OK  |FAIL |goals reached|Spawn|process has died" $log || true
@@ -47,6 +42,8 @@ docker run --rm --ipc=host "${GPU_ARGS[@]}" -v "$OUT":/results \
       echo; ros2 run tb3_nav2_demo plot_trajectory.py /results/trajectory.csv /results/trajectory.png \
         && status=0
     fi
-    kill -TERM $launch_pid; wait $launch_pid 2>/dev/null
+    kill -TERM $launch_pid
+    for _ in $(seq 20); do kill -0 $launch_pid 2>/dev/null || break; sleep 1; done
+    kill -KILL $launch_pid 2>/dev/null   # leftovers die with the container (--init)
     chown -R $HOST_UID:$HOST_GID /results
     exit $status'

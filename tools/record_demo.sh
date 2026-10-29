@@ -11,15 +11,9 @@ mkdir -p "$(dirname "$OUT_FILE")"
 OUT_DIR=$(cd "$(dirname "$OUT_FILE")" && pwd)
 IMAGE=${IMAGE:-tb3-nav2:latest}
 
-GPU_ARGS=()
-for node in /dev/dri/card* /dev/dri/renderD*; do
-  [[ -e $node ]] || continue
-  drv=$(basename "$(readlink -f "/sys/class/drm/$(basename "$node")/device/driver")" 2>/dev/null || true)
-  [[ $drv == nvidia ]] && continue
-  GPU_ARGS+=(--device "$node")
-done
+source docker/gpu_args.sh
 
-docker run --rm --ipc=host "${GPU_ARGS[@]}" -v "$OUT_DIR":/results \
+docker run --rm --init --ipc=host "${GPU_ARGS[@]}" -v "$OUT_DIR":/results \
   -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" -e PREVIEW="${PREVIEW:-0}" \
   "$IMAGE" bash -c "
     \$(ros2 pkg prefix tb3_nav2_demo)/lib/tb3_nav2_demo/record_demo.sh /results/$(basename "$OUT_FILE") $LOOPS

@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
+<!--
+  Derived from nav2_minimal_tb3_sim/worlds/tb3_sandbox.sdf.xacro (Open Navigation
+  LLC / Nav2 contributors, Apache-2.0). Changes: a <gui> layout block, and three
+  extra obstacles that are not in the static map.
+-->
 <sdf version="1.6" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:arg name="headless" default="true"/>
 
