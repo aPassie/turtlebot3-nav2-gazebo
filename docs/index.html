@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TurtleBot3 + Nav2: navigating around obstacles it was never told about</title>
+<style>
+  :root {
+    color-scheme: dark;
+    /* page + chart chrome (dark steps of the reference palette) */
+    --page: #0d0d0d;
+    --surface-1: #1a1a19;
+    --surface-2: #222220;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    /* identity: one colour per parameter profile, used everywhere on the page */
+    --series-1: #3987e5;   /* stock Nav2 params */
+    --series-2: #d95926;   /* tuned v1 */
+    --series-3: #199e70;   /* tuned final */
+    --series-4: #c98500;   /* speed limits only (isolation test) */
+    /* state */
+    --critical: #d03b3b;   /* obstacle detected by LiDAR */
+    --good: #0ca30c;
+    --accent: #b8e05a;     /* page accent: current goal, links, highlights */
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--page); color: var(--text-primary); font: 16px/1.6 var(--sans); }
+  a { color: var(--accent); }
+  code, .mono { font-family: var(--mono); font-size: 0.9em; }
+  code { background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+  h1, h2, h3 { line-height: 1.2; margin: 0 0 12px; letter-spacing: -0.01em; }
+  h2 { font-size: 30px; }
+  h3 { font-size: 19px; }
+  p { margin: 0 0 14px; color: var(--text-secondary); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 72px 0; border-top: 1px solid var(--grid); }
+  .kicker { font: 600 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .lede { font-size: 18px; max-width: 760px; }
+  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .muted { color: var(--text-muted); }
+  .small { font-size: 13px; }
+
+  /* nav */
+  nav.top { position: sticky; top: 0; z-index: 20; background: rgba(13,13,13,0.85); backdrop-filter: blur(8px); border-bottom: 1px solid var(--grid); }
+  nav.top .wrap { display: flex; align-items: center; gap: 22px; height: 54px; overflow-x: auto; }
+  nav.top .brand { font: 700 14px var(--mono); color: var(--text-primary); white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+  nav.top a.link { color: var(--text-secondary); text-decoration: none; font-size: 14px; white-space: nowrap; }
+  nav.top a.link:hover { color: var(--text-primary); }
+  .radar { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--accent); position: relative; overflow: hidden; }
+  .radar::after { content: ""; position: absolute; inset: 0; background: conic-gradient(from 0deg, rgba(184,224,90,0.7), transparent 25%); animation: spin 2.4s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* hero */
+  .hero { padding: 64px 0 56px; border-top: 0; }
+  .hero h1 { font-size: clamp(34px, 5vw, 56px); max-width: 900px; }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero-img { margin-top: 36px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); position: relative; aspect-ratio: 16 / 9; background: #000; }
+  .hero-img img { width: 100%; height: 100%; object-fit: cover; display: block; animation: drift 24s ease-in-out infinite alternate; transform-origin: 70% 40%; }
+  @keyframes drift { from { transform: scale(1); } to { transform: scale(1.06); } }
+  .hero-img .scan { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(184,224,90,0.55), transparent); animation: scan 5s linear infinite; }
+  @keyframes scan { from { top: 0; } to { top: 100%; } }
+  .hero-img .tag { position: absolute; top: 44px; right: 14px; background: rgba(0,0,0,0.65); padding: 6px 10px; border-radius: 6px; font: 12px var(--mono); color: var(--text-secondary); }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 30px; }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .tile .label { font-size: 13px; color: var(--text-secondary); }
+  .tile .value { font-size: 30px; font-weight: 650; margin: 4px 0 2px; }
+  .tile .sub { font-size: 12.5px; color: var(--text-muted); }
+  @media (max-width: 860px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { *, *::after { animation: none !important; } html { scroll-behavior: auto; } }
+
+  /* map vs world */
+  .twin { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 26px; }
+  .twin figure { margin: 0; }
+  .twin canvas { width: 100%; height: auto; display: block; border-radius: 10px; background: var(--surface-1); border: 1px solid var(--border); }
+  figcaption { font-size: 14px; color: var(--text-secondary); margin-top: 10px; }
+  figcaption b { color: var(--text-primary); }
+  @media (max-width: 760px) { .twin { grid-template-columns: 1fr; } }
+
+  /* replay */
+  .replay { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, 1fr); gap: 20px; margin-top: 26px; align-items: start; }
+  @media (max-width: 960px) { .replay { grid-template-columns: 1fr; } }
+  .stage { position: relative; background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 10px; }
+  #replay { width: 100%; height: auto; display: block; border-radius: 8px; }
+  .toast { position: absolute; top: 20px; left: 50%; transform: translate(-50%, -10px); opacity: 0; transition: all .35s; background: var(--critical); color: #fff; font-weight: 600; font-size: 14px; padding: 8px 14px; border-radius: 8px; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+  button, .seg button { font: 600 13px var(--sans); color: var(--text-primary); background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+  button:hover { background: #2b2b29; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; background: transparent; color: var(--text-secondary); }
+  .seg button[aria-pressed="true"] { background: var(--surface-2); color: var(--text-primary); }
+  .seg button .key { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+  label.check { font-size: 13px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .scrub { position: relative; margin-top: 14px; }
+  .scrub input[type=range] { width: 100%; accent-color: var(--accent); }
+  .legs { position: relative; height: 22px; font: 11px var(--mono); color: var(--text-muted); }
+  .legs span { position: absolute; top: 2px; border-left: 1px solid var(--baseline); padding-left: 4px; white-space: nowrap; }
+  .panel h3 { margin-bottom: 6px; }
+  .readout { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 14px 0; font-size: 14px; }
+  .readout dt { color: var(--text-muted); }
+  .readout dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--text-primary); }
+  .event { border-left: 3px solid var(--baseline); padding: 8px 12px; background: var(--surface-2); border-radius: 0 8px 8px 0; font-size: 14px; color: var(--text-secondary); min-height: 62px; }
+  .event.alert { border-left-color: var(--critical); color: var(--text-primary); }
+  .event.ok { border-left-color: var(--good); color: var(--text-primary); }
+  .key-list { list-style: none; padding: 0; margin: 14px 0 0; font-size: 13px; color: var(--text-secondary); display: grid; gap: 6px; }
+  .key-list i { display: inline-block; width: 18px; height: 10px; margin-right: 8px; vertical-align: middle; border-radius: 2px; }
+
+  /* architecture */
+  .arch { margin-top: 26px; display: grid; grid-template-columns: 1fr; gap: 16px; }
+  #arch-info { min-height: 120px; }
+  #arch svg { width: 100%; height: auto; display: block; }
+  .node rect { fill: var(--surface-2); stroke: var(--baseline); stroke-width: 1; rx: 10; transition: stroke .2s, fill .2s; }
+  .node text { fill: var(--text-primary); font: 600 15px var(--sans); }
+  .node text.sub { fill: var(--text-muted); font: 11.5px var(--mono); }
+  .node { cursor: pointer; }
+  .node:hover rect, .node.active rect, .node:focus rect { stroke: var(--accent); fill: #2a2a27; }
+  .node:focus { outline: none; }
+  .node .badge rect { fill: var(--accent); stroke: none; rx: 4; }
+  .node .badge text { fill: #0b0b0b; font: 700 10px var(--mono); }
+  .edge { fill: none; stroke: var(--baseline); stroke-width: 1.5; }
+  .flow { fill: none; stroke-width: 2; stroke-dasharray: 4 10; animation: flow 1.4s linear infinite; }
+  .flow.sense { stroke: #6da7ec; }
+  .flow.cmd { stroke: var(--accent); }
+  .flow.plan { stroke: #c3c2b7; opacity: .7; }
+  @keyframes flow { to { stroke-dashoffset: -28; } }
+  .edge-label { fill: var(--text-secondary); font: 11.5px var(--mono); }
+  .group-label { fill: var(--text-muted); font: 600 12px var(--mono); letter-spacing: .1em; }
+
+  /* video */
+  .video-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 26px; }
+  video { width: 100%; border-radius: 12px; border: 1px solid var(--border); background: #000; display: block; }
+  .chapters { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chapters button .t { font-family: var(--mono); color: var(--text-muted); margin-right: 6px; font-weight: 500; }
+  .chapters button.hot { border-color: var(--critical); }
+  .filmstrip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 12px; }
+  .filmstrip figure { margin: 0; }
+  .filmstrip img { width: 100%; display: block; border-radius: 8px; border: 1px solid var(--border); }
+  .filmstrip figcaption { font-size: 12.5px; margin-top: 6px; }
+  @media (max-width: 860px) { .filmstrip { grid-template-columns: repeat(2, 1fr); } }
+  .stills { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 30px; }
+  .stills img { width: 100%; display: block; border-radius: 10px; border: 1px solid var(--border); }
+  @media (max-width: 760px) { .stills { grid-template-columns: 1fr; } }
+
+  /* story timeline */
+  .timeline { position: relative; margin-top: 30px; }
+  .timeline::before { content: ""; position: absolute; left: 15px; top: 6px; bottom: 6px; width: 2px; background: var(--grid); }
+  .step { position: relative; padding-left: 50px; margin-bottom: 34px; }
+  .step .dot { position: absolute; left: 6px; top: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--page); border: 2px solid var(--accent); font: 700 10px/16px var(--mono); text-align: center; color: var(--accent); }
+  .step .body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 22px; align-items: start; }
+  .step img { width: 100%; border-radius: 10px; border: 1px solid var(--border); background: #fff; cursor: zoom-in; }
+  @media (max-width: 860px) { .step .body { grid-template-columns: 1fr; } }
+  .verdict { display: inline-block; font: 700 11px var(--mono); letter-spacing: .06em; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
+  .verdict.bad { background: rgba(208,59,59,.18); color: #ff8a8a; }
+  .verdict.good { background: rgba(12,163,12,.18); color: #7fdc7f; }
+  .verdict.meh { background: rgba(195,194,183,.15); color: var(--text-secondary); }
+
+  /* charts */
+  .chart-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 26px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--text-secondary); }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 7px; vertical-align: -1px; }
+  .multiples { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+  @media (max-width: 960px) { .multiples { grid-template-columns: 1fr; } }
+  .chart { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px 16px 10px; }
+  .chart h3 { font-size: 15px; margin-bottom: 2px; }
+  .chart .sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 8px; }
+  .chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .chart .tick { fill: var(--text-muted); font: 11px var(--sans); font-variant-numeric: tabular-nums; }
+  .chart .rowlabel { fill: var(--text-secondary); font: 12px var(--sans); }
+  .chart .val { fill: var(--text-primary); font: 600 11.5px var(--sans); font-variant-numeric: tabular-nums; }
+  .chart .gridline { stroke: var(--grid); stroke-width: 1; }
+  .chart .base { stroke: var(--baseline); stroke-width: 1; }
+  .chart .bar { transition: opacity .15s; }
+  .chart .hit { fill: transparent; cursor: default; }
+  .chart .hit:hover + .bar, .chart .hit:focus + .bar { opacity: .75; }
+  .tooltip { position: fixed; z-index: 50; pointer-events: none; background: #2b2b29; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 13px; opacity: 0; transition: opacity .1s; max-width: 260px; }
+  .tooltip .v { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+  .tooltip .l { color: var(--text-secondary); }
+  .tooltip .k { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--grid); }
+  th { color: var(--text-muted); font-weight: 600; font-size: 12.5px; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  #table-view[hidden] { display: none; }
+
+  /* debugging cards */
+  .bugs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 26px; }
+  @media (max-width: 860px) { .bugs { grid-template-columns: 1fr; } }
+  .bug h3 { font-size: 16.5px; }
+  .bug dl { margin: 0; display: grid; grid-template-columns: 86px 1fr; gap: 8px 12px; font-size: 14px; }
+  .bug dt { font: 700 11px/1.9 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+  .bug dd { margin: 0; color: var(--text-secondary); }
+  .bug dd.fix { color: var(--text-primary); }
+
+  /* run it */
+  pre { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font: 13.5px/1.6 var(--mono); color: var(--text-primary); position: relative; margin: 0 0 14px; }
+  pre .c { color: var(--text-muted); }
+  pre button.copy { position: absolute; top: 8px; right: 8px; font-size: 12px; padding: 4px 9px; }
+  footer { padding: 40px 0 60px; border-top: 1px solid var(--grid); color: var(--text-muted); font-size: 13px; }
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: none; align-items: center; justify-content: center; z-index: 60; cursor: zoom-out; }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 92vw; max-height: 90vh; border-radius: 10px; background: #fff; }
+</style>
+</head>
+<body>
+
+<nav class="top" aria-label="Sections">
+  <div class="wrap">
+    <span class="brand"><span class="radar" aria-hidden="true"></span>tb3-nav2-gazebo</span>
+    <a class="link" href="#idea">Idea</a>
+    <a class="link" href="#replay-section">Live replay</a>
+    <a class="link" href="#architecture">Architecture</a>
+    <a class="link" href="#video">Demo video</a>
+    <a class="link" href="#experiments">Experiments</a>
+    <a class="link" href="#debugging">Debugging</a>
+    <a class="link" href="#run">Run it</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">ROS 2 Jazzy · Gazebo Harmonic · Nav2 · TurtleBot3 Waffle</div>
+    <h1>A robot that navigates around obstacles <em>it was never told about</em>.</h1>
+    <p class="lede">A simulated TurtleBot3 drives a 5-goal patrol using the ROS 2 Navigation2 stack.
+      Three obstacles that are <b>not on the map</b> Nav2 was given sit on the routes it would
+      otherwise take, and a fourth is dropped right in front of the robot mid-run. Nav2 only learns
+      about them through its LiDAR, marks them in its costmaps and plans around them. No custom
+      navigation code: the work is integration, configuration and measuring what actually happens.</p>
+
+    <div class="tiles" role="list">
+      <div class="tile" role="listitem"><div class="label">Goals reached</div><div class="value" id="t-goals">–</div><div class="sub" id="t-goals-sub"></div></div>
+      <div class="tile" role="listitem"><div class="label">Contact with obstacles</div><div class="value">0</div><div class="sub" id="t-clear-sub"></div></div>
+      <div class="tile" role="listitem"><div class="label">Obstacles not in the map</div><div class="value">4</div><div class="sub">one dropped onto the route mid-run</div></div>
+      <div class="tile" role="listitem"><div class="label">Stall at the surprise box</div><div class="value" id="t-stall">–</div><div class="sub">stock speed vs. real-robot speed limit</div></div>
+    </div>
+
+    <div class="hero-img">
+      <img src="assets/hero_frame.jpg" alt="Gazebo on the left showing the hexagonal TurtleBot3 world with a magenta surprise box; RViz on the right showing the costmap and the green replanned path">
+      <div class="scan" aria-hidden="true"></div>
+      <div class="tag">frame from media/demo.mp4 at 0:37: the surprise box (magenta) has just appeared</div>
+    </div>
+  </div>
+</header>
+
+<section id="idea">
+  <div class="wrap">
+    <div class="kicker">01 · The idea</div>
+    <h2>What Nav2 knows vs. what's really there</h2>
+    <p class="lede">Nav2 plans on a <b>static map</b> (left). The Gazebo world it's driving in
+      (right) has extra obstacles that aren't on that map. The only way the robot finds out about
+      them is its 360° LiDAR, which feeds the obstacle layers of Nav2's costmaps in real time.</p>
+    <div class="twin">
+      <figure>
+        <canvas id="twin-map" width="640" height="600" aria-label="Static map given to Nav2: hexagonal walls and nine pillars"></canvas>
+        <figcaption><b>The map Nav2 is given</b> (<code>tb3_sandbox.pgm</code>): walls and 9 pillars. Nothing else.</figcaption>
+      </figure>
+      <figure>
+        <canvas id="twin-world" width="640" height="600" aria-label="Gazebo world: the same map plus a crate, a barrel, a barrier and a surprise box"></canvas>
+        <figcaption><b>The world the robot is actually in</b>: plus a crate, a barrel and a barrier, each placed
+          on a route the planner really uses, and a <span style="color:#e87bd0">surprise box</span> (dashed) that's spawned
+          only once the robot gets within 1.2 m of that spot.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="replay-section">
+  <div class="wrap">
+    <div class="kicker">02 · Live replay</div>
+    <h2>Watch the robot discover the obstacles</h2>
+    <p class="lede">This is the <b>real path</b> the robot drove, logged from Nav2's feedback at ~10 Hz.
+      The LiDAR rays are re-simulated in your browser from each logged pose (360°, 3.5 m range), so you
+      can see <em>when</em> each unmapped obstacle gets detected. Hit points on obstacles that aren't on the
+      map turn red, like the marks in Nav2's costmap. Switch to the stock-params run to compare.</p>
+
+    <div class="replay">
+      <div class="stage">
+        <canvas id="replay" width="640" height="600" aria-label="Animated replay of the robot's logged path over the map"></canvas>
+        <div class="toast" id="toast" role="status" aria-live="polite">Surprise box dropped on the route!</div>
+        <div class="controls">
+          <button id="play" aria-label="Play">▶ Play</button>
+          <div class="seg" role="group" aria-label="Playback speed">
+            <button data-speed="1" aria-pressed="false">1×</button>
+            <button data-speed="2" aria-pressed="true">2×</button>
+            <button data-speed="4" aria-pressed="false">4×</button>
+          </div>
+          <div class="seg" role="group" aria-label="Which run">
+            <button data-run="tuned" aria-pressed="true"><span class="key" style="background:var(--series-3)"></span>Tuned (demo run)</button>
+            <button data-run="stock" aria-pressed="false"><span class="key" style="background:var(--series-1)"></span>Stock (run 2)</button>
+          </div>
+          <label class="check"><input type="checkbox" id="show-rays" checked> LiDAR</label>
+          <label class="check"><input type="checkbox" id="show-trail" checked> Trail</label>
+        </div>
+        <div class="scrub">
+          <input type="range" id="scrub" min="0" max="1000" value="0" step="1" aria-label="Replay time">
+          <div class="legs" id="legs"></div>
+        </div>
+      </div>
+
+      <div class="panel card">
+        <h3>Telemetry</h3>
+        <dl class="readout">
+          <dt>time</dt><dd id="r-time">0.0 s</dd>
+          <dt>leg</dt><dd id="r-leg">north_west</dd>
+          <dt>speed</dt><dd id="r-speed">0.00 m/s</dd>
+          <dt>clearance</dt><dd id="r-clear">–</dd>
+          <dt>marked cells</dt><dd id="r-marked">0</dd>
+        </dl>
+        <div class="event" id="r-event">Press play. The robot starts at the white circle and drives to the five goals (stars) in order.</div>
+        <ul class="key-list">
+          <li><i style="background:#c3c2b7"></i>static map (known to Nav2)</li>
+          <li><i style="background:transparent;border:1.5px dashed #898781"></i>real obstacle, not yet seen</li>
+          <li><i style="background:var(--critical)"></i>detected by LiDAR → marked in costmap</li>
+          <li><i style="background:var(--accent)"></i>current goal</li>
+          <li><i style="background:var(--series-3)"></i>path driven (tuned run) · <i style="background:var(--series-1);margin-left:4px"></i>stock run</li>
+        </ul>
+        <p class="small muted" style="margin-top:14px">Clearance = distance from the robot's 0.22 m footprint to the nearest unmapped obstacle surface.
+          Timing is the logged wall-clock time (sim ran at ~1.0× real time).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <div class="kicker">03 · Architecture</div>
+    <h2>How the pieces talk to each other</h2>
+    <p class="lede">Everything inside the Nav2 box is stock Nav2. My job was integration, configuration and
+      measurement. Nodes marked <span class="mono" style="background:var(--accent);color:#0b0b0b;padding:0 5px;border-radius:3px;font-weight:700">TUNED</span>
+      or <span class="mono" style="background:#6da7ec;color:#0b0b0b;padding:0 5px;border-radius:3px;font-weight:700">MINE</span>
+      are where I changed or added something. Click any node.</p>
+    <div class="arch">
+      <div class="card" id="arch">
+        <svg viewBox="0 0 1000 560" role="img" aria-label="Data flow: Gazebo publishes LiDAR, odometry and clock through ros_gz_bridge into AMCL and the costmaps; the planner and MPPI controller produce velocity commands that pass the velocity smoother and collision monitor back to Gazebo">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#5a5a56"></path>
+            </marker>
+          </defs>
+          <path d="M310 50 H988 V548 H515 V165 H310 Z" fill="none" stroke="#3a3a37" stroke-dasharray="6 6"></path>
+          <text class="group-label" x="975" y="538" text-anchor="end">NAV2 · stock nodes</text>
+          <g id="edges"></g>
+          <g id="nodes"></g>
+        </svg>
+      </div>
+      <div class="card" id="arch-info" aria-live="polite">
+        <h3 id="ai-title">Click a node</h3>
+        <p id="ai-body">Blue dashes are sensor data flowing in, lime dashes are velocity commands flowing out to the wheels, grey are plans and costmaps.</p>
+        <p id="ai-mine" class="small"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="video">
+  <div class="wrap">
+    <div class="kicker">04 · Demo video</div>
+    <h2>The 79-second run, Gazebo + RViz</h2>
+    <p class="lede">Recorded fully automatically inside the container (virtual display + ffmpeg, no desktop capture):
+      Gazebo on the left, RViz on the right, a live caption from the patrol log at the bottom.
+      Jump to a chapter, or turn on <b>sync</b> to drive the replay above from the video.</p>
+    <div class="video-grid">
+      <video id="demo" controls preload="metadata" src="../media/demo.mp4" poster="assets/hero_frame.jpg">
+        Your browser can't play this video. Open <a href="../media/demo.mp4">media/demo.mp4</a> directly.
+      </video>
+      <div class="chapters" id="chapters" aria-label="Video chapters"></div>
+      <label class="check"><input type="checkbox" id="sync"> Sync the live replay (section 02) to this video</label>
+      <p class="small muted" id="video-missing" hidden>Couldn't load <code>../media/demo.mp4</code>. Open this page from inside the repo (<code>docs/index.html</code>) so the relative path resolves.</p>
+    </div>
+
+    <h3 style="margin-top:34px">The surprise moment, frame by frame (RViz)</h3>
+    <div class="filmstrip">
+      <figure><img src="assets/strip_1.jpg" alt="RViz: robot heading south, green plan straight down the east side"><figcaption><b>0:35.6</b> Plan (green) runs straight down the east side.</figcaption></figure>
+      <figure><img src="assets/strip_2.jpg" alt="RViz: new obstacle marked below the robot, plan swings west"><figcaption><b>0:36.8</b> The box is in the costmap below the robot; the plan swings west.</figcaption></figure>
+      <figure><img src="assets/strip_3.jpg" alt="RViz: robot rotating toward the new path"><figcaption><b>0:38.0</b> The robot turns onto the new path.</figcaption></figure>
+      <figure><img src="assets/strip_4.jpg" alt="RViz: robot driving the new route between pillars"><figcaption><b>0:40.0</b> It goes around through the pillars. No recovery needed.</figcaption></figure>
+      <figure><img src="assets/gz_surprise.jpg" alt="Gazebo: magenta surprise box on the east side of the arena"><figcaption><b>Gazebo</b> The magenta box that just appeared.</figcaption></figure>
+    </div>
+
+    <div class="stills">
+      <figure style="margin:0"><img src="assets/gazebo.jpg" alt="Gazebo view of the arena"><figcaption><b>Gazebo Harmonic.</b> The simulated world: hexagon walls, 9 white pillars, and my obstacles (orange crate, blue barrel, yellow barrier). Bottom right shows the real-time factor (~100%).</figcaption></figure>
+      <figure style="margin:0"><img src="assets/rviz.jpg" alt="RViz view with costmaps"><figcaption><b>RViz.</b> What Nav2 "thinks": the map with the global costmap (pink/cyan inflation), the local costmap window around the robot (darker square), the global plan (green) and the local plan (orange).</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="experiments">
+  <div class="wrap">
+    <div class="kicker">05 · Experiments</div>
+    <h2>How the demo got better, one measured change at a time</h2>
+    <p class="lede">Runs 2–8 are reproducible with <code>./tools/headless_test.sh &lt;config&gt;</code>. After every run I
+      plotted the real trajectory, measured clearance and read the logs instead of trusting "goal succeeded".
+      Two of my own conclusions didn't survive this, and both corrections are shown below. Click a plot to enlarge it.</p>
+
+    <div class="timeline">
+      <div class="step">
+        <div class="dot">0</div>
+        <div class="body">
+          <div>
+            <span class="verdict bad">TEST WAS WRONG</span>
+            <h3>Run 0: obstacles in the "obvious" corridors</h3>
+            <p>5/5 goals, but the plot showed NavFn takes the shortest route <em>between</em> the pillars, so 3 of the 4
+              obstacles were never closer than 0.4 m to the path. The one that mattered (the barrel) got the MPPI
+              controller stuck ("Failed to make progress"): a recovery ran and the leg took 33 s.</p>
+            <p class="small muted">Fix: move every obstacle onto the paths the planner actually took in this run.</p>
+          </div>
+          <img src="../results/run0_first_layout/trajectory.png" alt="Run 0 trajectory: obstacles mostly off the driven path">
+        </div>
+      </div>
+      <div class="step">
+        <div class="dot">1</div>
+        <div class="body">
+          <div>
+            <span class="verdict bad">TEST WAS WRONG</span>
+            <h3>Run 1: a timer is the wrong trigger</h3>
+            <p>The static obstacles now force detours, but the robot took a different route on the
+              <code>south</code> leg, so the box spawned 6 s into the leg landed where it never went. The
+              "best" clearance of all runs here (+0.215 m) is a symptom of a broken test, not better navigation.</p>
+            <p class="small muted">Fix: spawn the box once the robot is within 1.2 m of a point on its current route.</p>
+          </div>
+          <img src="../results/run1_stock_layout_timer/trajectory.png" alt="Run 1 trajectory: surprise box far from the path">
+        </div>
+      </div>
+      <div class="step">
+        <div class="dot">2</div>
+        <div class="body">
+          <div>
+            <span class="verdict good">REAL TEST</span>
+            <h3>Runs 2 &amp; 4: proximity trigger, stock params</h3>
+            <p>Now the box lands about 1 m ahead of the robot. It <b>stops ~0.55 m short for 1.6–2.1 s</b>, then sets off on
+              a new route through the pillars, with no recoveries and no contact. Why stop? In both runs the log shows, 0.9 s
+              after the spawn, <code>collision_monitor: Robot to approach for 1.2 seconds away from collision</code> and
+              <code>Optimizer fail to compute path</code>. At 0.5 m/s the safety layer's 1.2 s horizon is ~0.6 m, which is
+              exactly the stopping distance.</p>
+          </div>
+          <img src="../results/run2_stock/trajectory.png" alt="Run 2 trajectory: robot reroutes west when the box appears">
+        </div>
+      </div>
+      <div class="step">
+        <div class="dot">3</div>
+        <div class="body">
+          <div>
+            <span class="verdict meh">HYPOTHESIS REJECTED · CONFOUNDED</span>
+            <h3>Runs 3–6: real TurtleBot3 speed limits + two costmap rates</h3>
+            <p>I set the speed to the real Waffle's 0.26 m/s, and in the same runs raised the local costmap to 10 Hz (later
+              the global costmap 1 → 5 Hz). I expected the slower robot to keep more distance from the box. <b>It didn't</b>:
+              clearance stayed in the same band, because it's set by costmap inflation and the route, not speed. The stall
+              did drop to 0–0.5 s, and I credited the 5 Hz global costmap with rerouting ~1 s sooner. That was two
+              changes too many to say what caused what.</p>
+          </div>
+          <img src="../results/run3_tuned/trajectory.png" alt="Run 3 trajectory with tuned speed limits">
+        </div>
+      </div>
+      <div class="step">
+        <div class="dot">7</div>
+        <div class="body">
+          <div>
+            <span class="verdict good">CAUSE ISOLATED · CLAIM RETRACTED</span>
+            <h3>Run 7: change only the speed limits</h3>
+            <p>After an independent review pointed out the confound (and that the simulated LiDAR only runs at 5 Hz), I
+              re-ran with <em>only</em> the speed limits changed. Result: stall <b>0.0 s in both runs</b>, and zero
+              collision-monitor interventions. At 0.26 m/s the 1.2 s horizon is ~0.31 m, so MPPI steers away before the
+              safety layer has to act. The speed limit explains the whole improvement. The costmap-rate changes show no
+              effect beyond noise, so I retracted the "~1 s sooner" claim.</p>
+          </div>
+          <img src="../results/run7_speed_only_1/trajectory.png" alt="Run 7 trajectory: speed limits only">
+        </div>
+      </div>
+      <div class="step">
+        <div class="dot">8</div>
+        <div class="body">
+          <div>
+            <span class="verdict good">PORTABILITY CHECK</span>
+            <h3>Run 8: no GPU at all</h3>
+            <p>The default config with no GPU device in the container (Mesa software rendering), which is what a reviewer's VM
+              or CI would have, also passes: 5/5 goals, no stall, +0.12 m clearance.</p>
+          </div>
+          <img src="../results/run8_no_gpu_software_render/trajectory.png" alt="Run 8 trajectory with software rendering">
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:8px">
+      <h3>How much to trust these numbers</h3>
+      <p class="small" style="margin:0">n = 2–4 runs per config, so leg-time differences of ~1 s are noise. Poses are the AMCL
+        estimate, not Gazebo ground truth, and AMCL corrections make them jump by up to ~5 cm. The tightest clearances
+        (+0.06 to +0.10 m with a conservative 0.24 m corner radius) are only 1–2× that, so "no contact" also rests on zero
+        recoveries or stuck events in every run after run 0. Times are wall-clock at ~1.0× real-time factor.</p>
+    </div>
+
+    <div class="chart-head">
+      <h3 style="margin:0">Comparable runs (same world, same proximity trigger)</h3>
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <div class="legend" aria-label="Parameter profiles">
+          <span><i style="background:var(--series-1)"></i>Stock Nav2 params</span>
+          <span><i style="background:var(--series-2)"></i>Tuned v1: real speed limits, 10 Hz local costmap</span>
+          <span><i style="background:var(--series-3)"></i>Tuned final: + 5 Hz global costmap</span>
+          <span><i style="background:var(--series-4)"></i>Speed limits only (isolation)</span>
+        </div>
+        <button id="toggle-table" aria-expanded="false" aria-controls="table-view">Show table</button>
+      </div>
+    </div>
+    <div class="multiples" id="charts"></div>
+    <div id="table-view" class="card tablewrap" style="margin-top:16px" hidden></div>
+
+    <h3 style="margin-top:40px">What I changed in <code>nav2_params.yaml</code></h3>
+    <p class="small muted">The two costmap-rate changes are harmless but unjustified by the data. They stay in the default only because the
+      recorded demo used them. What I'd ship is <code>nav2_params_exp_speed_only.yaml</code> plus the initial pose.</p>
+    <div class="card tablewrap" style="margin-top:12px">
+      <table>
+        <thead><tr><th>Parameter</th><th>Stock</th><th>Tuned</th><th>Evidence</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">MPPI vx_max / vx_min / wz_max</td><td class="num">0.5 / −0.35 / 1.9</td><td class="num">0.26 / −0.26 / 1.82</td><td>Real Waffle limits. Removes the collision-monitor stop (runs 2/4 vs 7)</td></tr>
+          <tr><td class="mono">velocity_smoother max/min velocity</td><td class="num">±0.5, ±2.0</td><td class="num">±0.26, ±1.82</td><td>Same limits after smoothing</td></tr>
+          <tr><td class="mono">local_costmap update_frequency</td><td class="num">5 Hz</td><td class="num">10 Hz</td><td><b>No measurable effect.</b> LiDAR publishes at 5 Hz</td></tr>
+          <tr><td class="mono">global_costmap update_frequency</td><td class="num">1 Hz</td><td class="num">5 Hz</td><td><b>No measurable effect</b> beyond noise (run 7 vs 6)</td></tr>
+          <tr><td class="mono">amcl set_initial_pose</td><td class="num">off</td><td class="num">on (spawn pose)</td><td>No manual "2D Pose Estimate" needed</td></tr>
+          <tr><td class="mono">inflation radius / scaling</td><td class="num">0.7 m / 3.0</td><td class="num">unchanged</td><td>No recoveries or contact with it, so no evidence to change it</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="debugging">
+  <div class="wrap">
+    <div class="kicker">06 · Debugging</div>
+    <h2>Things that broke, and how I found out why</h2>
+    <div class="bugs">
+      <div class="card bug">
+        <h3>Gazebo segfaulted on start</h3>
+        <dl>
+          <dt>Symptom</dt><dd>Patrol waited forever for an AMCL pose; <code>gz sim</code> died with a segfault after <i>"Failed to create dummy render window"</i>.</dd>
+          <dt>Cause</dt><dd>Hybrid AMD + NVIDIA laptop. With all of <code>/dev/dri</code> passed in, EGL tried the NVIDIA node first (no driver in the container), so Ogre2 crashed. That meant no LiDAR, no localisation.</dd>
+          <dt>Found by</dt><dd><code>eglinfo</code> inside the container + mapping render nodes via <code>/sys/class/drm/*/device/driver</code>.</dd>
+          <dt>Fix</dt><dd class="fix">Pass only Mesa-capable GPU nodes (<code>docker/gpu_args.sh</code>). Gazebo now renders on the AMD iGPU (radeonsi), with <code>NO_GPU=1</code> falling back to software rendering (verified, run 8). The NVIDIA-toolkit path is untested.</dd>
+        </dl>
+      </div>
+      <div class="card bug">
+        <h3>"5/5 SUCCEEDED" while the test was meaningless</h3>
+        <dl>
+          <dt>Symptom</dt><dd>Every goal succeeded, so on paper everything worked.</dd>
+          <dt>Cause</dt><dd>The obstacles and the timer-spawned box were not on the robot's actual route.</dd>
+          <dt>Found by</dt><dd>Logging the driven path and plotting it over the map.</dd>
+          <dt>Fix</dt><dd class="fix">Data-driven obstacle placement, proximity trigger, and an automatic clearance check that fails the test on contact.</dd>
+        </dl>
+      </div>
+      <div class="card bug">
+        <h3>RViz couldn't draw the robot</h3>
+        <dl>
+          <dt>Symptom</dt><dd>RobotModel display red; "Could not load resource …/models/tire.dae".</dd>
+          <dt>Cause</dt><dd>Two upstream bugs: the <code>nav2_minimal_tb3_sim</code> URDF points at the wrong mesh paths, and the stock RViz config subscribes to the latched <code>/robot_description</code> with Volatile QoS, so it never receives it.</dd>
+          <dt>Fix</dt><dd class="fix">Symlink the meshes in the Dockerfile; Transient Local QoS in the RViz configs.</dd>
+        </dl>
+      </div>
+      <div class="card bug">
+        <h3>The test harness hung after a successful run</h3>
+        <dl>
+          <dt>Symptom</dt><dd>Patrol finished, but the script never exited.</dd>
+          <dt>Cause</dt><dd>A regex that didn't match the log format, and <code>kill -INT</code> on a background job. Non-interactive bash starts background jobs with SIGINT ignored.</dd>
+          <dt>Fix</dt><dd class="fix">Correct regex + SIGTERM.</dd>
+        </dl>
+      </div>
+      <div class="card bug">
+        <h3>First demo recording was unwatchable</h3>
+        <dl>
+          <dt>Symptom</dt><dd>Gazebo's inspector panels and RViz's docks covered half the screen, and the map wasn't even in view.</dd>
+          <dt>Cause</dt><dd>Default GUI layouts; the camera service call didn't take effect; RViz's saved window state overrides its "hide dock" flags.</dd>
+          <dt>Fix</dt><dd class="fix">A <code>&lt;gui&gt;</code> block in the world with a fixed camera, and a dock-free <code>record.rviz</code>. Previewed with single screenshots before recording.</dd>
+        </dl>
+      </div>
+      <div class="card bug">
+        <h3>My own analysis was wrong, twice</h3>
+        <dl>
+          <dt>1st</dt><dd>I wrote that the closest approach to the surprise box happens "the instant it appears". The speed profile showed it comes 5–6 s <em>after</em> the trigger.</dd>
+          <dt>2nd</dt><dd>I credited the 5 Hz global costmap with faster rerouting. An isolation run showed the speed limit explains all of it, and the logs showed the stock stall is a collision-monitor intervention.</dd>
+          <dt>Fix</dt><dd class="fix">Both corrected in the README and on this page. Change one variable at a time, and read the logs before explaining a number.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="run">
+  <div class="wrap">
+    <div class="kicker">07 · Run it yourself</div>
+    <h2>Three commands</h2>
+    <pre><button class="copy">Copy</button><span class="c"># build the image (ROS 2 Jazzy + Gazebo Harmonic + Nav2)</span>
+docker build -t tb3-nav2 .
+<span class="c"># full demo: Gazebo + RViz, robot drives the patrol on its own</span>
+./docker/run.sh
+<span class="c"># headless end-to-end test with plot + clearance check -> results/&lt;tag&gt;/</span>
+./tools/headless_test.sh tuned</pre>
+    <pre><button class="copy">Copy</button><span class="c"># drive it yourself with "Nav2 Goal" in RViz</span>
+./docker/run.sh ros2 launch tb3_nav2_demo demo.launch.py patrol:=False
+<span class="c"># A/B against the untouched upstream parameters</span>
+./tools/headless_test.sh stock
+<span class="c"># re-record the demo video / rebuild this page's data</span>
+./tools/record_demo.sh &amp;&amp; python3 tools/build_page_data.py</pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Built on <a href="https://docs.nav2.org/">Nav2</a> (<code>nav2_bringup</code>, <code>nav2_minimal_tb3_sim</code>, <code>nav2_simple_commander</code>),
+    TurtleBot3 models by ROBOTIS and <a href="https://gazebosim.org/">Gazebo</a>. Every number on this page is generated from
+    <code>results/</code> and <code>media/</code> by <code>tools/build_page_data.py</code>. The live replay re-simulates the LiDAR in the
+    browser from the logged (AMCL-estimated) poses; it isn't a recording of the real scan. The surprise box's appearance is shown
+    ~0.8 s after the trigger to approximate the spawn latency.
+  </div>
+</footer>
+
+<div class="tooltip" id="tip" role="tooltip"></div>
+<div class="lightbox" id="lightbox"><img alt=""></div>
+
+<script src="assets/data.js"></script>
+<script>
+(() => {
+  'use strict';
+  const D = window.PROJECT_DATA;
+  if (!D) { document.body.insertAdjacentHTML('afterbegin', '<p style="padding:20px;color:#ff8a8a">assets/data.js missing. Run python3 tools/build_page_data.py</p>'); return; }
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const C = {
+    free: '#1f1f1d', occ: '#c3c2b7', unknown: '#121211', grid: '#2c2c2a',
+    critical: css('--critical'), accent: css('--accent'), muted: '#898781',
+    tuned: css('--series-3'), stock: css('--series-1'), text: '#f0efec',
+  };
+  const M = D.map, RES = M.res;
+  const W = M.cols, H = M.rows;
+
+  // ---------- geometry ----------
+  const occAt = (x, y) => {
+    const c = Math.floor((x - M.xmin) / RES), r = Math.floor((M.ymax - y) / RES);
+    if (c < 0 || r < 0 || c >= W || r >= H) return true;
+    return M.cells[r][c] === '1';
+  };
+  function insideObstacle(o, x, y, pad = 0) {
+    const dx = x - o.x, dy = y - o.y;
+    if (o.kind === 'cyl') return Math.hypot(dx, dy) <= o.r + pad;
+    const c = Math.cos(-o.yaw), s = Math.sin(-o.yaw);
+    const lx = c * dx - s * dy, ly = s * dx + c * dy;
+    return Math.abs(lx) <= o.sx / 2 + pad && Math.abs(ly) <= o.sy / 2 + pad;
+  }
+  function surfaceDist(o, x, y) {
+    const dx = x - o.x, dy = y - o.y;
+    if (o.kind === 'cyl') return Math.hypot(dx, dy) - o.r;
+    const c = Math.cos(-o.yaw), s = Math.sin(-o.yaw);
+    const lx = c * dx - s * dy, ly = s * dx + c * dy;
+    return Math.hypot(Math.max(Math.abs(lx) - o.sx / 2, 0), Math.max(Math.abs(ly) - o.sy / 2, 0));
+  }
+
+  // ---------- drawing helpers ----------
+  function setupCanvas(cv) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const cssW = cv.width, cssH = cv.height;
+    cv.width = cssW * dpr; cv.height = cssH * dpr;
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr * cssW / (W * 5), 0, 0, dpr * cssH / (H * 5), 0, 0);
+    return ctx;   // drawing units: 5 px per map cell
+  }
+  const PX = 5 / RES;                                   // px per metre in drawing units
+  const tx = (x) => (x - M.xmin) * PX, ty = (y) => (M.ymax - y) * PX;
+
+  const mapImg = document.createElement('canvas');
+  mapImg.width = W * 5; mapImg.height = H * 5;
+  (() => {
+    const g = mapImg.getContext('2d');
+    for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) {
+      const v = M.cells[r][c];
+      g.fillStyle = v === '1' ? C.occ : v === '0' ? C.free : C.unknown;
+      g.fillRect(c * 5, r * 5, 5, 5);
+    }
+    g.strokeStyle = 'rgba(255,255,255,0.04)'; g.lineWidth = 1;
+    for (let m = Math.ceil(M.xmin); m <= M.xmin + W * RES; m++) { g.beginPath(); g.moveTo(tx(m), 0); g.lineTo(tx(m), H * 5); g.stroke(); }
+    for (let m = Math.ceil(M.ymax - H * RES); m <= M.ymax; m++) { g.beginPath(); g.moveTo(0, ty(m)); g.lineTo(W * 5, ty(m)); g.stroke(); }
+  })();
+
+  function obstaclePath(ctx, o, scale = 1) {
+    ctx.beginPath();
+    if (o.kind === 'cyl') { ctx.arc(tx(o.x), ty(o.y), o.r * PX * scale, 0, Math.PI * 2); return; }
+    ctx.save(); ctx.translate(tx(o.x), ty(o.y)); ctx.rotate(-o.yaw); ctx.scale(scale, scale);
+    ctx.rect(-o.sx / 2 * PX, -o.sy / 2 * PX, o.sx * PX, o.sy * PX); ctx.restore();
+  }
+  const rgb = (c, a = 1) => `rgba(${c.map(v => Math.round(v * 255)).join(',')},${a})`;
+  function drawStar(ctx, x, y, r, fill, stroke) {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r;
+      ctx.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a));
+    }
+    ctx.closePath(); ctx.fillStyle = fill; ctx.fill();
+    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1.5; ctx.stroke(); }
+  }
+  function drawGoals(ctx, current) {
+    D.waypoints.forEach((w, i) => {
+      const hot = i === current;
+      drawStar(ctx, tx(w.x), ty(w.y), hot ? 13 : 10, hot ? C.accent : '#4a4a46', hot ? '#0b0b0b' : null);
+      ctx.fillStyle = hot ? C.text : C.muted; ctx.font = '600 13px system-ui, sans-serif';
+      ctx.fillText(w.name, tx(w.x) + 12, ty(w.y) - 10);
+    });
+    ctx.beginPath(); ctx.arc(tx(D.start.x), ty(D.start.y), 9, 0, Math.PI * 2);
+    ctx.strokeStyle = C.text; ctx.lineWidth = 2; ctx.stroke();
+  }
+
+  // ---------- section 01: map vs world ----------
+  (() => {
+    const a = setupCanvas(document.getElementById('twin-map'));
+    a.drawImage(mapImg, 0, 0); drawGoals(a, -1);
+    const b = setupCanvas(document.getElementById('twin-world'));
+    b.drawImage(mapImg, 0, 0);
+    D.obstacles.forEach(o => {
+      obstaclePath(b, o);
+      if (o.spawned) { b.setLineDash([6, 5]); b.strokeStyle = '#e87bd0'; b.lineWidth = 2.5; b.stroke(); b.setLineDash([]); }
+      else { b.fillStyle = rgb(o.color); b.fill(); }
+      b.fillStyle = C.text; b.font = '600 13px system-ui, sans-serif';
+      const off = { barrel: [-10, -16, 'right'], surprise_box: [-16, 34, 'right'], crate: [14, 24, 'left'], barrier: [12, 22, 'left'] }[o.name] || [14, 22, 'left'];
+      b.textAlign = off[2]; b.fillText(o.spawned ? 'surprise box' : o.name, tx(o.x) + off[0], ty(o.y) + off[1]); b.textAlign = 'left';
+    });
+    drawGoals(b, -1);
+  })();
+
+  // ---------- section 02: replay ----------
+  const cv = document.getElementById('replay');
+  const ctx = setupCanvas(cv);
+  const surprise = D.obstacles.find(o => o.spawned);
+  const SPAWN_LATENCY = 0.8;    // ros_gz_sim create takes ~1 s to insert the model
+  const RAYS_DRAW = 72, RAYS_MARK = 180, RANGE = 3.5, STEP = 0.025;
+
+  const runs = {};
+  for (const [k, tr] of Object.entries(D.trajectories)) {
+    const P = tr.points;   // [t, legIdx, x, y]
+    const head = new Array(P.length);
+    // The log has positions only, so heading is inferred from motion. A direction
+    // flip of more than 120 deg is the robot reversing (MPPI allows vx < 0), not a
+    // U-turn in place, so keep facing the same way.
+    let last = null;
+    for (let i = 0; i < P.length; i++) {
+      const a = P[Math.max(0, i - 3)], b = P[Math.min(P.length - 1, i + 3)];
+      if (Math.hypot(b[2] - a[2], b[3] - a[3]) > 0.02) {
+        let dir = Math.atan2(b[3] - a[3], b[2] - a[2]);
+        if (last !== null) {
+          const diff = Math.atan2(Math.sin(dir - last), Math.cos(dir - last));
+          if (Math.abs(diff) > 2.1) dir += Math.PI;
+        }
+        last = dir;
+      }
+      head[i] = last ?? D.start.yaw;
+    }
+    // spawn time = first sample on the spawn leg within the trigger distance
+    const legIdx = D.legs.indexOf(surprise.leg);
+    const trig = P.find(p => p[1] === legIdx && Math.hypot(p[2] - surprise.x, p[3] - surprise.y) < surprise.trigger);
+    runs[k] = { P, head, T: P[P.length - 1][0], legStart: tr.legStart, spawnAt: trig ? trig[0] + SPAWN_LATENCY : Infinity, triggerAt: trig ? trig[0] : Infinity };
+  }
+
+  const st = { run: 'tuned', t: 0, playing: false, speed: 2, marks: new Map(), lastMarkT: -1, toastShown: false };
+  const R = () => runs[st.run];
+
+  function idxAt(P, t) {
+    let lo = 0, hi = P.length - 1;
+    while (lo < hi) { const m = (lo + hi + 1) >> 1; if (P[m][0] <= t) lo = m; else hi = m - 1; }
+    return lo;
+  }
+  function poseAt(t) {
+    const { P, head } = R();
+    const i = idxAt(P, t), j = Math.min(i + 1, P.length - 1);
+    const a = P[i], b = P[j], f = b[0] > a[0] ? Math.min(1, Math.max(0, (t - a[0]) / (b[0] - a[0]))) : 0;
+    return { x: a[2] + (b[2] - a[2]) * f, y: a[3] + (b[3] - a[3]) * f, th: head[i], leg: a[1], i };
+  }
+  function speedAt(t) {
+    const p0 = poseAt(Math.max(0, t - 0.5)), p1 = poseAt(t);
+    const dt = Math.min(0.5, t); return dt > 0 ? Math.hypot(p1.x - p0.x, p1.y - p0.y) / dt : 0;
+  }
+  const activeObstacles = (t) => D.obstacles.filter(o => !o.spawned || t >= R().spawnAt);
+
+  function castRay(x, y, a, obs) {
+    const dx = Math.cos(a), dy = Math.sin(a);
+    for (let d = 0.12; d <= RANGE; d += STEP) {
+      const px = x + dx * d, py = y + dy * d;
+      for (const o of obs) if (insideObstacle(o, px, py)) return { d, px, py, o };
+      if (occAt(px, py)) return { d, px, py, o: null };
+    }
+    return { d: RANGE, px: x + dx * RANGE, py: y + dy * RANGE, o: null, miss: true };
+  }
+  function markFrom(t) {
+    const p = poseAt(t), obs = activeObstacles(t);
+    for (let k = 0; k < RAYS_MARK; k++) {
+      const h = castRay(p.x, p.y, (k / RAYS_MARK) * Math.PI * 2, obs);
+      if (h.o) {
+        const c = Math.floor((h.px - M.xmin) / RES), r = Math.floor((M.ymax - h.py) / RES);
+        st.marks.set(r * W + c, h.o.name);
+      }
+    }
+  }
+  function resimulate(t) {
+    st.marks.clear();
+    for (let s = 0; s <= t; s += 0.25) markFrom(s);
+    st.lastMarkT = t;
+  }
+
+  function legLabel(i) { return D.legs[i]; }
+  function eventFor(t, p, v) {
+    const r = R();
+    if (t >= r.T - 0.05) return ['ok', 'Patrol complete: all 5 goals reached, no recoveries, no contact.'];
+    if (t >= r.triggerAt && t < r.spawnAt) return ['alert', 'Robot is within 1.2 m of the drop point, so the patrol node is spawning the surprise box via ros_gz_sim…'];
+    if (t >= r.spawnAt && legLabel(p.leg) === surprise.leg) {
+      if (v < 0.05) return ['alert', st.run === 'stock'
+        ? 'Stopped. At 0.5 m/s, collision_monitor\'s 1.2 s look-ahead (~0.6 m) reaches the box, so it slows the robot to a halt, and MPPI briefly reports "Optimizer fail to compute path".'
+        : 'New obstacle in the costmap. The robot is slowing while the planner computes a new route.'];
+      const near = surfaceDist(surprise, p.x, p.y);
+      if (near < 1.2) return ['alert', 'Rerouting: following the new global plan around the surprise box.'];
+    }
+    const seen = new Set(st.marks.values());
+    const names = D.obstacles.filter(o => !o.spawned && seen.has(o.name)).map(o => o.name);
+    return ['', `Driving to <b>${legLabel(p.leg)}</b>. Unmapped obstacles detected so far: ${names.length ? names.join(', ') : 'none'}.`];
+  }
+
+  const el = (id) => document.getElementById(id);
+  const ui = { time: el('r-time'), leg: el('r-leg'), speed: el('r-speed'), clear: el('r-clear'), marked: el('r-marked'), event: el('r-event'), scrub: el('scrub'), play: el('play'), toast: el('toast') };
+
+  function render() {
+    const r = R(), t = st.t, p = poseAt(t);
+    ctx.clearRect(0, 0, W * 5, H * 5);
+    ctx.drawImage(mapImg, 0, 0);
+
+    // ghost outlines of unmapped obstacles (real, but unknown to Nav2)
+    for (const o of D.obstacles) {
+      if (o.spawned && t < r.spawnAt) continue;
+      let scale = 1;
+      if (o.spawned) { const k = Math.min(1, (t - r.spawnAt) / 0.4); scale = 0.4 + 0.6 * (1 - Math.pow(1 - k, 3)); }
+      obstaclePath(ctx, o, scale);
+      ctx.setLineDash([5, 4]); ctx.strokeStyle = o.spawned ? '#e87bd0' : C.muted; ctx.lineWidth = 1.6; ctx.stroke(); ctx.setLineDash([]);
+      if (o.spawned && t - r.spawnAt < 1.2) { ctx.fillStyle = 'rgba(232,123,208,0.25)'; ctx.fill(); }
+    }
+    // marked cells
+    ctx.fillStyle = C.critical;
+    for (const key of st.marks.keys()) ctx.fillRect((key % W) * 5, Math.floor(key / W) * 5, 5, 5);
+
+    // trail
+    if (el('show-trail').checked) {
+      const P = r.P, end = p.i;
+      ctx.lineJoin = ctx.lineCap = 'round'; ctx.lineWidth = 3;
+      ctx.strokeStyle = st.run === 'tuned' ? C.tuned : C.stock;
+      ctx.beginPath();
+      for (let i = 0; i <= end; i++) { const q = P[i]; i ? ctx.lineTo(tx(q[2]), ty(q[3])) : ctx.moveTo(tx(q[2]), ty(q[3])); }
+      ctx.lineTo(tx(p.x), ty(p.y)); ctx.stroke();
+    }
+
+    drawGoals(ctx, p.leg);
+
+    // LiDAR
+    const obs = activeObstacles(t);
+    if (el('show-rays').checked) {
+      for (let k = 0; k < RAYS_DRAW; k++) {
+        const h = castRay(p.x, p.y, p.th + (k / RAYS_DRAW) * Math.PI * 2, obs);
+        ctx.strokeStyle = 'rgba(240,239,236,0.07)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(tx(p.x), ty(p.y)); ctx.lineTo(tx(h.px), ty(h.py)); ctx.stroke();
+        if (!h.miss) { ctx.fillStyle = h.o ? C.critical : 'rgba(240,239,236,0.55)'; ctx.fillRect(tx(h.px) - 1.5, ty(h.py) - 1.5, 3, 3); }
+      }
+    }
+    // robot (TB3 Waffle-ish footprint, 0.22 m radius ring)
+    ctx.save(); ctx.translate(tx(p.x), ty(p.y)); ctx.rotate(-p.th);
+    ctx.beginPath(); ctx.arc(0, 0, D.robotRadius * PX, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(240,239,236,0.35)'; ctx.lineWidth = 1; ctx.stroke();
+    const bw = 0.28 * PX, bh = 0.3 * PX;
+    ctx.fillStyle = '#f0efec'; ctx.strokeStyle = '#0b0b0b'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(-bw / 2, -bh / 2, bw, bh, 6); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#0b0b0b'; ctx.beginPath(); ctx.moveTo(bw / 2 - 2, 0); ctx.lineTo(bw / 2 - 12, -7); ctx.lineTo(bw / 2 - 12, 7); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.arc(-4, 0, 5, 0, Math.PI * 2); ctx.fillStyle = '#3a3a37'; ctx.fill();   // LiDAR turret
+    ctx.restore();
+
+    // readouts
+    const v = speedAt(t);
+    const clear = Math.min(...obs.map(o => surfaceDist(o, p.x, p.y))) - D.robotRadius;
+    ui.time.textContent = `${t.toFixed(1)} s / ${r.T.toFixed(1)} s`;
+    ui.leg.textContent = `${p.leg + 1}/5 → ${legLabel(p.leg)}`;
+    ui.speed.textContent = `${v.toFixed(2)} m/s`;
+    ui.clear.textContent = `${clear >= 0 ? '+' : ''}${clear.toFixed(2)} m`;
+    ui.marked.textContent = `${st.marks.size}`;
+    const [cls, html] = eventFor(t, p, v);
+    ui.event.className = 'event ' + cls; ui.event.innerHTML = html;
+    ui.scrub.value = Math.round((t / r.T) * 1000);
+
+    if (t >= r.spawnAt && t - r.spawnAt < 2.5 && st.playing) { if (!st.toastShown) { ui.toast.classList.add('show'); st.toastShown = true; setTimeout(() => ui.toast.classList.remove('show'), 2600); } }
+    if (t < r.spawnAt) st.toastShown = false;
+  }
+
+  function buildLegs() {
+    const r = R(), box = el('legs'); box.textContent = '';
+    D.legs.forEach((name) => {
+      const s = document.createElement('span');
+      s.style.left = `${(r.legStart[name] / r.T) * 100}%`; s.textContent = name; box.appendChild(s);
+    });
+  }
+
+  let lastFrame = null;
+  function tick(now) {
+    if (lastFrame === null) lastFrame = now;
+    const dt = Math.min(0.1, (now - lastFrame) / 1000); lastFrame = now;
+    const vid = el('demo');
+    if (el('sync').checked && !vid.paused) {
+      const target = Math.max(0, Math.min(R().T, vid.currentTime - D.videoPatrolStart));
+      if (Math.abs(target - st.t) > 1.0) resimulate(target);
+      st.t = target;
+    } else if (st.playing) {
+      st.t = Math.min(R().T, st.t + dt * st.speed);
+      if (st.t >= R().T) setPlaying(false);
+    }
+    if (st.t - st.lastMarkT >= 0.1) { markFrom(st.t); st.lastMarkT = st.t; }
+    render();
+    requestAnimationFrame(tick);
+  }
+  function setPlaying(on) {
+    if (on && st.t >= R().T) { st.t = 0; resimulate(0); }
+    st.playing = on; ui.play.textContent = on ? '❚❚ Pause' : '▶ Play';
+    ui.play.setAttribute('aria-label', on ? 'Pause' : 'Play');
+  }
+  ui.play.addEventListener('click', () => setPlaying(!st.playing));
+  document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => {
+    st.speed = +b.dataset.speed;
+    document.querySelectorAll('[data-speed]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  }));
+  function setRun(k) {
+    st.run = k; st.t = Math.min(st.t, R().T); resimulate(st.t); buildLegs();
+    document.querySelectorAll('[data-run]').forEach(x => x.setAttribute('aria-pressed', x.dataset.run === k));
+  }
+  document.querySelectorAll('[data-run]').forEach(b => b.addEventListener('click', () => { el('sync').checked = false; setRun(b.dataset.run); }));
+  let scrubTimer = null;
+  ui.scrub.addEventListener('input', () => {
+    st.t = (ui.scrub.value / 1000) * R().T;
+    clearTimeout(scrubTimer); scrubTimer = setTimeout(() => resimulate(st.t), 60);
+  });
+  buildLegs();
+  // Deep link: #replay=stock@38 opens the replay at that run and time (no autoplay).
+  const deep = location.hash.match(/replay=(tuned|stock)@([\d.]+)/);
+  if (deep) {
+    setRun(deep[1]); st.t = Math.min(R().T, +deep[2]); resimulate(st.t);
+    setTimeout(() => document.getElementById('replay-section').scrollIntoView(), 50);
+  } else {
+    // autoplay when the replay scrolls into view (once)
+    new IntersectionObserver((ents, obs) => {
+      if (ents.some(e => e.isIntersecting)) { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setPlaying(true); obs.disconnect(); }
+    }, { threshold: 0.45 }).observe(cv);
+  }
+  requestAnimationFrame(tick);
+
+  // ---------- section 03: architecture ----------
+  const NODES = {
+    gazebo:  { x: 20,  y: 210, w: 220, h: 110, title: 'Gazebo Harmonic', sub: 'physics · LiDAR · diff-drive', badge: 'MINE', badgeColor: '#6da7ec',
+      body: 'Simulates the TurtleBot3 Waffle (360° LiDAR, IMU, diff-drive) in the TurtleBot3 hexagon world. Runs at ~1.0× real time on the AMD iGPU.',
+      mine: 'Mine: the world file adds 3 obstacles that are not in the map, a fixed overview camera / minimal GUI, and the surprise box is inserted at run time with ros_gz_sim create.' },
+    bridge:  { x: 320, y: 230, w: 175, h: 70, title: 'ros_gz_bridge', sub: '/scan /odom /tf /clock',
+      body: 'Translates Gazebo transport topics to ROS 2: /scan, /odom, /tf, /clock out; /cmd_vel in.', mine: '' },
+    map:     { x: 330, y: 70,  w: 150, h: 64, title: 'map_server', sub: 'static map',
+      body: 'Serves tb3_sandbox.pgm: walls and pillars only. Deliberately contains none of the extra obstacles.', mine: '' },
+    amcl:    { x: 540, y: 70,  w: 170, h: 64, title: 'AMCL', sub: 'localisation: map→odom', badge: 'TUNED',
+      body: 'Particle-filter localisation: matches LiDAR scans against the static map and publishes the map→odom transform.',
+      mine: 'Tuned: set_initial_pose at the spawn pose so no manual "2D Pose Estimate" is needed.' },
+    gcost:   { x: 540, y: 180, w: 170, h: 70, title: 'Global costmap', sub: 'static + obstacle layer', badge: 'TUNED',
+      body: 'Static map + a LiDAR obstacle layer + inflation. This is where unmapped obstacles enter the planner\'s world.',
+      mine: 'Tuned: update_frequency 1 → 5 Hz. No effect I could measure beyond noise (run 7 vs 6); kept only because the recorded demo used it.' },
+    lcost:   { x: 540, y: 300, w: 170, h: 70, title: 'Local costmap', sub: '3×3 m LiDAR voxels', badge: 'TUNED',
+      body: 'A 3×3 m window around the robot built from the LiDAR, used by the controller to avoid what\'s right in front of it.',
+      mine: 'Tuned: update_frequency 5 → 10 Hz. In hindsight pointless: the simulated LiDAR only publishes at 5 Hz, and run 7 shows no effect.' },
+    planner: { x: 780, y: 180, w: 190, h: 70, title: 'planner_server', sub: 'NavFn global path',
+      body: 'Computes the global path on the global costmap. The behaviour tree asks for a new path every second.', mine: '' },
+    ctrl:    { x: 780, y: 300, w: 190, h: 70, title: 'controller_server', sub: 'MPPI trajectory sampling', badge: 'TUNED',
+      body: 'Model Predictive Path Integral controller: samples 2000 trajectories per cycle at 20 Hz and picks the best one against the path and local costmap.',
+      mine: 'Tuned: velocity limits set to the real TurtleBot3 Waffle (0.26 m/s, 1.82 rad/s) instead of 0.5 m/s. This is the one change with a measured effect: it removes the collision-monitor stop at the surprise box.' },
+    bt:      { x: 780, y: 70,  w: 190, h: 64, title: 'bt_navigator', sub: 'replan + recoveries (BT)',
+      body: 'Runs the NavigateToPose behaviour tree: replan at 1 Hz, follow path, and run recoveries (clear costmaps, spin, back up, wait) if stuck.', mine: '' },
+    patrol:  { x: 20,  y: 56,  w: 220, h: 84, title: 'patrol.py', sub: 'nav2_simple_commander', badge: 'MINE', badgeColor: '#6da7ec',
+      body: 'Sends the 5 goals one by one as NavigateToPose actions, logs results / recoveries / the driven path.',
+      mine: 'Mine: also drops the surprise box onto the route when the robot comes within 1.2 m of it.' },
+    smooth:  { x: 780, y: 440, w: 190, h: 64, title: 'velocity_smoother', sub: 'accel / velocity limits', badge: 'TUNED',
+      body: 'Smooths the controller\'s velocity commands within acceleration and velocity limits.',
+      mine: 'Tuned: same real-robot velocity limits as the controller.' },
+    cmon:    { x: 540, y: 440, w: 170, h: 64, title: 'collision_monitor', sub: 'last safety check', badge: 'STALL CAUSE', badgeColor: '#ff8a8a',
+      body: 'Final safety layer. Its FootprintApproach polygon slows the robot so it can never collide within the next 1.2 s.',
+      mine: 'Key finding: with stock params (0.5 m/s) this, not the planner, is what stopped the robot ~0.55 m short of the surprise box for ~2 s ("Robot to approach for 1.2 seconds away from collision" in the logs).' },
+  };
+  // [from, to, kind, label, path, [labelX, labelY, anchor]]
+  const EDGES = [
+    ['gazebo', 'bridge', 'sense', 'sensors', 'M240 250 L320 250', [280, 243, 'middle']],
+    ['bridge', 'amcl', 'sense', '/scan', 'M410 230 V150 H525 V118 H540', [416, 205, 'start']],
+    ['bridge', 'gcost', 'sense', '', 'M495 250 L540 228'],
+    ['bridge', 'lcost', 'sense', '', 'M495 282 L540 325'],
+    ['map', 'amcl', 'plan', '', 'M480 102 L540 102'],
+    ['map', 'gcost', 'plan', 'map', 'M455 134 V198 H540', [462, 190, 'start']],
+    ['patrol', 'bt', 'plan', 'NavigateToPose goals (action)', 'M240 98 H285 V30 H875 V70', [580, 23, 'middle']],
+    ['bt', 'planner', 'plan', '', 'M875 134 V180'],
+    ['gcost', 'planner', 'plan', '', 'M710 215 H780'],
+    ['planner', 'ctrl', 'plan', 'path', 'M875 250 V300', [882, 280, 'start']],
+    ['lcost', 'ctrl', 'plan', '', 'M710 335 H780'],
+    ['ctrl', 'smooth', 'cmd', 'cmd_vel', 'M875 370 V440', [882, 410, 'start']],
+    ['smooth', 'cmon', 'cmd', '', 'M780 472 H710'],
+    ['cmon', 'bridge', 'cmd', '/cmd_vel', 'M540 472 H410 V300', [470, 465, 'middle']],
+    ['bridge', 'gazebo', 'cmd', 'cmd_vel', 'M320 285 L240 285', [280, 302, 'middle']],
+  ];
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; };
+  const gE = document.getElementById('edges'), gN = document.getElementById('nodes');
+  EDGES.forEach(([a, b, kind, label, d, at]) => {
+    mk('path', { d, class: 'edge', 'marker-end': 'url(#arrow)', 'data-a': a, 'data-b': b }, gE);
+    mk('path', { d, class: `flow ${kind}`, 'data-a': a, 'data-b': b }, gE);
+    if (label && at) {
+      const t = mk('text', { class: 'edge-label', x: at[0], y: at[1], 'text-anchor': at[2] }, gE); t.textContent = label;
+    }
+  });
+  const info = { title: el('ai-title'), body: el('ai-body'), mine: el('ai-mine') };
+  Object.entries(NODES).forEach(([id, n]) => {
+    const g = mk('g', { class: 'node', tabindex: 0, role: 'button', 'aria-label': n.title, 'data-id': id }, gN);
+    mk('rect', { x: n.x, y: n.y, width: n.w, height: n.h }, g);
+    const t1 = mk('text', { x: n.x + 14, y: n.y + n.h / 2 - 2 }, g); t1.textContent = n.title;
+    const t2 = mk('text', { class: 'sub', x: n.x + 14, y: n.y + n.h / 2 + 16 }, g); t2.textContent = n.sub;
+    if (n.badge) {
+      const bg = mk('g', { class: 'badge' }, g);
+      const bwid = n.badge.length * 7 + 10;
+      const r = mk('rect', { x: n.x + n.w - bwid - 8, y: n.y - 9, width: bwid, height: 18 }, bg);
+      if (n.badgeColor) r.style.fill = n.badgeColor;
+      const bt = mk('text', { x: n.x + n.w - bwid - 3, y: n.y + 4 }, bg); bt.textContent = n.badge;
+    }
+    const show = () => {
+      gN.querySelectorAll('.node').forEach(x => x.classList.toggle('active', x === g));
+      info.title.textContent = n.title; info.body.textContent = n.body; info.mine.textContent = n.mine;
+      gE.querySelectorAll('.flow').forEach(f => { f.style.opacity = (f.dataset.a === id || f.dataset.b === id) ? 1 : 0.15; });
+    };
+    g.addEventListener('click', show); g.addEventListener('focus', show);
+  });
+
+  // ---------- section 04: video ----------
+  const vid = el('demo');
+  const CHAPTERS = [
+    [0, 'Bring-up'], [7.5, 'Goal 1: north_west'], [21.25, 'Goal 2: east'], [34.0, 'Goal 3: south'],
+    [36.0, 'Surprise box!', true], [49.75, 'Goal 4: centre'], [57.5, 'Goal 5: home'], [74.25, 'Done'],
+  ];
+  const chapBox = el('chapters');
+  CHAPTERS.forEach(([t, label, hot]) => {
+    const b = document.createElement('button'); if (hot) b.className = 'hot';
+    const s = document.createElement('span'); s.className = 't';
+    s.textContent = `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+    b.appendChild(s); b.appendChild(document.createTextNode(label));
+    b.addEventListener('click', () => { vid.currentTime = Math.max(0, t - (hot ? 1.5 : 0)); vid.play(); });
+    chapBox.appendChild(b);
+  });
+  vid.addEventListener('error', () => { el('video-missing').hidden = false; });
+  el('sync').addEventListener('change', (e) => {
+    if (e.target.checked) { setRun('tuned'); setPlaying(false); if (vid.paused) vid.play(); }
+  });
+
+  // ---------- section 05: charts ----------
+  const PROFILE = {
+    stock: { color: css('--series-1'), name: 'Stock Nav2 params' },
+    tuned_v1: { color: css('--series-2'), name: 'Tuned v1' },
+    tuned: { color: css('--series-3'), name: 'Tuned final' },
+    speed_only: { color: css('--series-4'), name: 'Speed limits only' },
+  };
+  (() => {   // hero tiles, computed from the run data
+    const goals = D.runs.reduce((a, r) => { const [g, n] = r.goals.split('/').map(Number); return [a[0] + g, a[1] + n]; }, [0, 0]);
+    el('t-goals').textContent = `${goals[0]} / ${goals[1]}`;
+    el('t-goals-sub').textContent = `across ${D.runs.length} logged runs`;
+    const cmp = D.runs.filter(r => r.stall !== null);
+    const minC = Math.min(...cmp.map(r => r.clearance)), minCorner = Math.min(...cmp.map(r => r.clearance_corner));
+    el('t-clear-sub').textContent = `closest approach +${minC.toFixed(2)} m beyond the 0.22 m footprint (+${minCorner.toFixed(2)} m at 0.24 m)`;
+    const stockStall = Math.max(...cmp.filter(r => r.profile === 'stock').map(r => r.stall));
+    const speedStall = Math.max(...cmp.filter(r => r.profile === 'speed_only').map(r => r.stall));
+    el('t-stall').textContent = `${stockStall.toFixed(1)} → ${speedStall.toFixed(1)} s`;
+  })();
+  const comparable = D.runs.filter(r => r.stall !== null);
+  const METRICS = [
+    { key: 'drive', title: 'Total driving time', sub: 'seconds for the 5-goal patrol · lower is faster', unit: 's', fmt: v => v.toFixed(1), max: 80, ticks: [0, 20, 40, 60, 80] },
+    { key: 'stall', title: 'Stall at the surprise box', sub: 'seconds nearly stopped before rerouting · lower is better', unit: 's', fmt: v => v.toFixed(1), max: 2.5, ticks: [0, 0.5, 1, 1.5, 2, 2.5] },
+    { key: 'clearance', title: 'Minimum clearance', sub: 'metres beyond the 0.22 m footprint · above 0 = no contact', unit: 'm', fmt: v => (v >= 0 ? '+' : '') + v.toFixed(3), max: 0.2, ticks: [0, 0.05, 0.1, 0.15, 0.2] },
+  ];
+  const tip = el('tip');
+  function showTip(evt, run, metric) {
+    tip.textContent = '';
+    const v = document.createElement('div'); v.className = 'v'; v.textContent = `${metric.fmt(run[metric.key])} ${metric.unit}`;
+    const l = document.createElement('div'); l.className = 'l';
+    const k = document.createElement('span'); k.className = 'k'; k.style.background = PROFILE[run.profile].color;
+    l.appendChild(k); l.appendChild(document.createTextNode(`${run.label} · ${PROFILE[run.profile].name}`));
+    const n = document.createElement('div'); n.className = 'l'; n.style.fontSize = '12px'; n.textContent = run.note;
+    tip.append(v, l, n);
+    const rect = evt.target.getBoundingClientRect();
+    const x = (evt.clientX ?? rect.right) + 14, y = (evt.clientY ?? rect.top) - 10;
+    tip.style.left = `${Math.min(x, innerWidth - 270)}px`; tip.style.top = `${y}px`; tip.style.opacity = 1;
+  }
+  const hideTip = () => { tip.style.opacity = 0; };
+  const chartsBox = el('charts');
+  METRICS.forEach(metric => {
+    const card = document.createElement('div'); card.className = 'chart';
+    const h = document.createElement('h3'); h.textContent = metric.title;
+    const s = document.createElement('div'); s.className = 'sub'; s.textContent = metric.sub;
+    card.append(h, s);
+    const rowH = 30, top = 6, left = 64, right = 58, width = 340, plotW = width - left - right;
+    const height = top + comparable.length * rowH + 26;
+    const svg = mk('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-label': `${metric.title} per run` });
+    const xs = v => left + (v / metric.max) * plotW;
+    metric.ticks.forEach(tk => {
+      mk('line', { class: 'gridline', x1: xs(tk), x2: xs(tk), y1: top, y2: top + comparable.length * rowH }, svg);
+      const tt = mk('text', { class: 'tick', x: xs(tk), y: top + comparable.length * rowH + 16, 'text-anchor': 'middle' }, svg);
+      tt.textContent = tk;
+    });
+    mk('line', { class: 'base', x1: left, x2: left, y1: top, y2: top + comparable.length * rowH }, svg);
+    comparable.forEach((run, i) => {
+      const y = top + i * rowH, v = run[metric.key], bh = 16, by = y + (rowH - bh) / 2;
+      const lab = mk('text', { class: 'rowlabel', x: left - 10, y: y + rowH / 2 + 4, 'text-anchor': 'end' }, svg); lab.textContent = run.label;
+      const w = Math.max(0, xs(v) - left);
+      const hit = mk('rect', { class: 'hit', x: left, y, width: plotW + right, height: rowH, tabindex: 0, 'aria-label': `${run.label}: ${metric.fmt(v)} ${metric.unit}` }, svg);
+      // bar: square at the baseline, 4px rounded data-end
+      const r4 = Math.min(4, w / 2);
+      const d = w <= 0 ? '' : `M${left} ${by} H${left + w - r4} Q${left + w} ${by} ${left + w} ${by + r4} V${by + bh - r4} Q${left + w} ${by + bh} ${left + w - r4} ${by + bh} H${left} Z`;
+      mk('path', { class: 'bar', d, fill: PROFILE[run.profile].color }, svg);
+      const val = mk('text', { class: 'val', x: left + w + 6, y: y + rowH / 2 + 4 }, svg); val.textContent = metric.fmt(v);
+      hit.addEventListener('pointermove', e => showTip(e, run, metric));
+      hit.addEventListener('focus', e => showTip(e, run, metric));
+      hit.addEventListener('pointerleave', hideTip); hit.addEventListener('blur', hideTip);
+    });
+    card.appendChild(svg); chartsBox.appendChild(card);
+  });
+  // table view (all runs, incl. 0 and 1)
+  (() => {
+    const tbl = document.createElement('table');
+    const head = tbl.createTHead().insertRow();
+    ['Run', 'Params', 'What changed', 'Goals', 'Driving time', 'Recoveries', 'Min clearance (0.22 / 0.24 m)', 'Stall', 'south leg', 'Collision-monitor stops'].forEach(hh => { const th = document.createElement('th'); th.textContent = hh; head.appendChild(th); });
+    const body = tbl.createTBody();
+    D.runs.forEach(r => {
+      const tr = body.insertRow();
+      [r.label, PROFILE[r.profile].name, r.note, r.goals, `${r.drive.toFixed(1)} s`, `${r.recoveries}`,
+       `${r.clearance >= 0 ? '+' : ''}${r.clearance.toFixed(3)}${r.clearance_corner != null ? ' / +' + r.clearance_corner.toFixed(3) : ''} m${r.id === '1' ? ' *' : ''}`,
+       r.stall === null ? 'n/a' : `${r.stall.toFixed(1)} s`, r.south_leg != null ? `${r.south_leg.toFixed(1)} s` : '–',
+       r.collision_monitor != null ? `${r.collision_monitor}` : '–']
+        .forEach((c, i) => { const td = tr.insertCell(); td.textContent = c; if (i >= 3) td.className = 'num'; });
+    });
+    const note = document.createElement('p'); note.className = 'small muted'; note.style.marginTop = '10px';
+    note.textContent = '* Run 1\'s surprise box landed where the robot never went, so its clearance is not comparable. Runs 0–1 have no stall metric (the box was never in the way).';
+    el('table-view').append(tbl, note);
+    const btn = el('toggle-table');
+    btn.addEventListener('click', () => {
+      const tv = el('table-view'); tv.hidden = !tv.hidden;
+      btn.textContent = tv.hidden ? 'Show table' : 'Hide table'; btn.setAttribute('aria-expanded', !tv.hidden);
+    });
+  })();
+
+  // ---------- misc: copy buttons, lightbox ----------
+  document.querySelectorAll('pre button.copy').forEach(b => b.addEventListener('click', () => {
+    const text = [...b.parentElement.childNodes].filter(n => n !== b).map(n => n.textContent).join('')
+      .split('\n').filter(l => l.trim() && !l.trim().startsWith('#')).join('\n');
+    navigator.clipboard?.writeText(text).then(() => { b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy', 1500); });
+  }));
+  const lb = el('lightbox');
+  document.querySelectorAll('.step img').forEach(img => img.addEventListener('click', () => { lb.querySelector('img').src = img.src; lb.querySelector('img').alt = img.alt; lb.classList.add('open'); }));
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+})();
+</script>
+</body>
+</html>
