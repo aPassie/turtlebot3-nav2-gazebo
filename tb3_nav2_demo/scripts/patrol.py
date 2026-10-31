@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
-"""Drive the TurtleBot3 through a list of goals using Nav2's Simple Commander API.
+"""Drive the robot through the waypoints in config/waypoints.yaml.
 
-Each waypoint is sent as an individual NavigateToPose goal so that the result
-(succeeded / failed / canceled), the time taken and the number of recoveries
-can be reported per goal. Path planning and obstacle avoidance are done
-entirely by the stock Nav2 stack (planner_server + controller_server + costmaps).
-
-Extras for the demo / experiments:
-  * a waypoint may carry a `spawn` spec: a box is inserted into Gazebo (it is
-    not in the map) once the robot gets within `trigger_distance` of it;
-  * `trajectory_file` logs the pose from Nav2 feedback for plot_trajectory.py.
-Times are wall-clock; the simulation runs at ~1.0 real-time factor.
+Goals are sent one at a time with nav2_simple_commander so I get a result,
+time and recovery count for each one. A waypoint can also have a `spawn`
+entry: that box gets added to Gazebo when the robot comes within
+trigger_distance of it. Set trajectory_file to log the path for
+plot_trajectory.py. Times are wall-clock (sim runs at ~1x real time).
 """
 import math
 import subprocess
@@ -94,8 +89,7 @@ def main() -> int:
             start = time.monotonic()
             nav.goToPose(make_pose(nav, wp['x'], wp['y'], wp.get('yaw', 0.0)))
 
-            # Optional obstacle that appears on this leg once the robot gets
-            # within trigger_distance of it (so it lands right in its way).
+            # surprise box for this leg, spawned once the robot gets close
             spec = wp.get('spawn')
             if spec and spec['name'] in spawned:
                 spec = None

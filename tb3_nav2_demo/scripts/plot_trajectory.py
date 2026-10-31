@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-"""Plot a patrol trajectory over the static map and check obstacle clearance.
+"""Plot a patrol run over the map and check how close it got to the obstacles.
 
-Usage (inside the container):
   ros2 run tb3_nav2_demo plot_trajectory.py <trajectory.csv> <output.png>
 
-The unmapped obstacles are read from the demo world (after xacro expansion)
-and from the `spawn` entries of waypoints.yaml, so the plot always matches
-what Gazebo actually simulated. For every obstacle the minimum distance from
-the robot centre to the obstacle surface is printed; the TurtleBot3 waffle's
-footprint radius is ~0.22 m, so anything above that means no contact.
+Obstacles come from the world file and the spawn entries in waypoints.yaml.
+Prints the closest distance from the robot centre to each obstacle; the
+footprint radius is 0.22 m, so anything above that means no contact.
+Exits with 1 if the robot touched something.
 """
 import csv
 import math
@@ -141,9 +139,8 @@ def main():
         print(f'{ob["name"]:<26}{d:>27.3f}{"YES" if d < ROBOT_RADIUS else "no":>10}')
     print(f'robot footprint radius: {ROBOT_RADIUS} m -> min clearance {worst - ROBOT_RADIUS:+.3f} m')
 
-    # Reaction to each spawned obstacle: how long the robot sat (nearly) still
-    # between the spawn trigger and its closest approach, i.e. the time Nav2
-    # needed before it was moving along a new path.
+    # stall: time spent (almost) stopped between the spawn trigger and
+    # driving past the box
     for leg, sp, ob in spawns:
         m = np.array([lg == leg for lg in legs])
         t, x, y = ts[m], xs[m], ys[m]

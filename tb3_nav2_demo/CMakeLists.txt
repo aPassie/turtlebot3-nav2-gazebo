@@ -6,7 +6,7 @@ find_package(ament_cmake REQUIRED)
 install(DIRECTORY launch config worlds rviz
   DESTINATION share/${PROJECT_NAME})
 
-install(PROGRAMS scripts/patrol.py scripts/plot_trajectory.py scripts/record_demo.sh
+install(PROGRAMS scripts/patrol.py scripts/plot_trajectory.py
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

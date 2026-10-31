@@ -37,7 +37,7 @@ amcl:
     z_rand: 0.5
     z_short: 0.05
     scan_topic: scan
-    # Start localised at the Gazebo spawn pose (no manual "2D Pose Estimate" needed)
+    # start at the spawn pose so there's no need for "2D Pose Estimate"
     set_initial_pose: true
     initial_pose: {x: -2.0, y: -0.5, z: 0.0, yaw: 0.0}
 
@@ -110,8 +110,7 @@ controller_server:
       vx_std: 0.2
       vy_std: 0.2
       wz_std: 0.4
-      # [tuned] Real TurtleBot3 Waffle limits (0.26 m/s, 1.82 rad/s) instead of
-      # the stock 0.5 m/s / 1.9 rad/s, so the config would transfer to hardware.
+      # [tuned] real Waffle limits, stock was 0.5 m/s / 1.9 rad/s
       vx_max: 0.26
       vx_min: -0.26
       vy_max: 0.5
@@ -193,8 +192,7 @@ controller_server:
 local_costmap:
   local_costmap:
     ros__parameters:
-      # [tuned] 5 -> 10 Hz: obstacles that suddenly appear enter the costmap
-      # (and the MPPI cost critic) faster.
+      # [tuned] 5 -> 10 Hz. Turned out not to matter, the lidar only runs at 5 Hz (README run 7)
       update_frequency: 10.0
       publish_frequency: 2.0
       global_frame: odom
@@ -237,8 +235,8 @@ local_costmap:
 global_costmap:
   global_costmap:
     ros__parameters:
-      # [tuned] 1 -> 5 Hz: the planner learns about new obstacles sooner, so the
-      # robot reroutes earlier instead of stalling in front of them (README run 6).
+      # [tuned] 1 -> 5 Hz. No measurable effect either (README run 7), kept because
+      # the demo video was recorded with it
       update_frequency: 5.0
       publish_frequency: 1.0
       global_frame: map
@@ -371,7 +369,7 @@ velocity_smoother:
     stamp_smoothed_velocity_with_smoothing_time: False
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    # [tuned] Match the controller / real TB3 Waffle limits.
+    # [tuned] same limits as the controller
     max_velocity: [0.26, 0.0, 1.82]
     min_velocity: [-0.26, 0.0, -1.82]
     max_accel: [2.5, 0.0, 3.2]

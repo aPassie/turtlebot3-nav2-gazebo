@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Run the demo container with GUI (Gazebo + RViz) forwarded to the host X server.
-# Usage: ./docker/run.sh [command...]   (default: full demo launch)
+# Start the container with Gazebo/RViz shown on your X server.
+# ./docker/run.sh [command...]   (no command = full demo)
 set -euo pipefail
 
 IMAGE=${IMAGE:-tb3-nav2:latest}
 
-# Allow local containers to talk to the X server (XWayland works too).
+# let the container use the X server
 xhost +local:root >/dev/null 2>&1 || echo "warning: xhost not available; GUI may fail"
 
 source "$(dirname "$0")/gpu_args.sh"

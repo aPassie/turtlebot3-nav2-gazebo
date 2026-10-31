@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-# Headless end-to-end check: Gazebo (no GUI) + Nav2 + patrol, then plot the
-# driven path and verify clearance to every unmapped obstacle.
-# Usage: ./tools/headless_test.sh [params] [loops] [tag]
-#   params: tuned (default) | stock | <file>.yaml in tb3_nav2_demo/config/
-#   -> results/<tag>/ (log, csv, png)
+# Run the patrol without GUI, then plot the path and check clearance.
+# ./tools/headless_test.sh [tuned|stock|<file>.yaml] [loops] [tag]
+# Output goes to results/<tag>/. Exits 1 if a goal fails or the robot hits something.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

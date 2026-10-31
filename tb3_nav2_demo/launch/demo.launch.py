@@ -1,9 +1,7 @@
-"""TurtleBot3 (waffle) + Gazebo Harmonic + Nav2 autonomous navigation demo.
+"""TurtleBot3 + Nav2 demo.
 
-Reuses the upstream nav2_bringup TB3 simulation launch (Gazebo server/client,
-robot spawn + ros_gz bridge, map_server, AMCL, planner/controller/BT navigator,
-RViz) and swaps in this package's world, Nav2 parameters and RViz layout.
-Optionally starts the patrol node that sends a sequence of goals.
+Uses nav2_bringup's tb3_simulation_launch.py for everything (Gazebo, bridge,
+Nav2, RViz) with my world, params and RViz config, and starts patrol.py.
 """
 import os
 
@@ -28,7 +26,7 @@ def generate_launch_description():
             pkg, 'worlds', 'tb3_obstacles.sdf.xacro')),
         DeclareLaunchArgument('map', default_value=os.path.join(
             bringup, 'maps', 'tb3_sandbox.yaml'),
-            description='Static map. Deliberately does NOT contain the extra obstacles.'),
+            description='Static map (the extra obstacles are not in it)'),
         DeclareLaunchArgument('params_file', default_value=os.path.join(
             pkg, 'config', 'nav2_params.yaml')),
         DeclareLaunchArgument('rviz_config', default_value=os.path.join(
